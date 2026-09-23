@@ -1,0 +1,6 @@
+venv/
+__pycycache__/
+*.pyc
+.env
+node_modules/
+*.db
