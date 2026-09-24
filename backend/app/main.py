@@ -1,10 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .config import settings
-from .routers import auth, users, courses, classes, exams, reports
+from .routers import auth, users, courses, classes, exams, reports, admin
 
 app = FastAPI(title="Aula Site API",
-              description="Plataforma de apoyo pedagógico para Exámenes Libres (Chile)",
+              description="Plataforma de apoyo pedagogico para Examenes Libres (Chile)",
               version="1.0.0")
 
 app.add_middleware(
@@ -16,7 +16,7 @@ app.add_middleware(
 )
 
 for r in (auth.router, users.router, courses.router,
-          classes.router, exams.router, reports.router):
+          classes.router, exams.router, reports.router, admin.router):
     app.include_router(r)
 
 @app.get("/health")
