@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
 from ..database import get_db
@@ -36,9 +36,19 @@ def register(data: RegisterIn, db: Session = Depends(get_db)):
                     role=user.role, full_name=user.full_name)
 
 @router.post("/login", response_model=TokenOut)
-def login(data: LoginIn, db: Session = Depends(get_db)):
-    user = db.query(models.User).filter_by(email=data.email).first()
-    if not user or not verify_password(data.password, user.password_hash):
+async def login(request: Request, db: Session = Depends(get_db)):
+    # Acepta JSON (frontend) o formulario (Swagger UI / OAuth2 password flow)
+    ct = request.headers.get("content-type", "")
+    if ct.startswith("application/json"):
+        body = await request.json()
+        email, password = body.get("email"), body.get("password")
+    else:
+        form = await request.form()
+        email, password = form.get("username"), form.get("password")
+    if not email or not password:
+        raise HTTPException(401, "Credenciales inválidas")
+    user = db.query(models.User).filter_by(email=email).first()
+    if not user or not verify_password(password, user.password_hash):
         raise HTTPException(401, "Credenciales inválidas")
     return TokenOut(access_token=create_token(user.id, user.role),
                     role=user.role, full_name=user.full_name)
