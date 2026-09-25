@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { login } from '../api'
+import Logo from '../Logo'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -32,7 +33,7 @@ export default function Login() {
       </div>
       <div className="auth-card">
         <form onSubmit={submit}>
-          <div className="brand">Aula<span>Site</span></div>
+          <div className="brand" style={{display:'flex',alignItems:'center',gap:'.5rem'}}><Logo size={34} />Aula<span>Site</span></div>
           <p className="muted" style={{marginBottom:'1.6rem'}}>Apoyo pedagogico para Examenes Libres</p>
           {error && <div className="error" style={{marginBottom:'1rem'}}>{error}</div>}
           <label>Correo electronico</label>

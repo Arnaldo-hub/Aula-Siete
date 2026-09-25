@@ -37,6 +37,7 @@ def student_report(student_id: int,
         "lessons_completed": done,
         "lessons_total": len(prog),
         "exam_average": float(avg) if avg else None,
+            "points": int(pts or 0),
         "recent_attempts": [
             {"exam": e.title, "score": float(a.score), "date": str(a.finished_at)}
             for a, e in attempts],

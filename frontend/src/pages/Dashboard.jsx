@@ -43,7 +43,7 @@ export default function Dashboard() {
         <section className="card">
           <h3>Reporte de progreso</h3>
           <p>Lecciones completadas: <strong>{report.lessons_completed} / {report.lessons_total}</strong></p>
-          <p>Promedio simulaciones: <strong>{report.exam_average ?? '-'}%</strong></p>
+          <p>Promedio simulaciones: <strong>{report.exam_average ?? '-'}%</strong> · Puntos de practica: <strong>{report.points ?? 0}</strong> ⭐</p>
           <table>
             <thead><tr><th>Simulacion</th><th>Puntaje</th><th>Fecha</th></tr></thead>
             <tbody>

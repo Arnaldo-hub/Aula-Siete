@@ -129,3 +129,13 @@ class Progress(Base):
     lesson_id = Column(BigInteger, ForeignKey("lessons.id", ondelete="CASCADE"), primary_key=True)
     status = Column(String, default="pending")
     updated_at = Column(DateTime(timezone=True), server_default="now()")
+
+class Doubt(Base):
+    __tablename__ = "doubts"
+    id = Column(BigInteger, primary_key=True)
+    student_id = Column(BigInteger, ForeignKey("students.id", ondelete="CASCADE"), nullable=False)
+    asked_by = Column(BigInteger, ForeignKey("users.id"), nullable=False)
+    question = Column(Text, nullable=False)
+    answer = Column(Text)
+    created_at = Column(DateTime(timezone=True), server_default="now()")
+    answered_at = Column(DateTime(timezone=True))

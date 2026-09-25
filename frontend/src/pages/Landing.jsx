@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { BASE } from '../api'
+import Logo from '../Logo'
+import Chatbot from '../Chatbot'
 
-const WSP = 'https://wa.me/56981860524?text=Hola%2C%20quiero%20informaci%C3%B3n%20sobre%20Aula%20Site'
+const WSP = 'https://wa.me/56954690241?text=Hola%2C%20quiero%20informaci%C3%B3n%20sobre%20Aula%20Site'
 
 export default function Landing() {
   const [stats, setStats] = useState(null)
@@ -15,7 +17,7 @@ export default function Landing() {
   return (
     <div>
       <nav className="nav">
-        <Link to="/" className="logo">Aula<span>Site</span></Link>
+        <Link to="/" className="logo" style={{display:'flex',alignItems:'center',gap:'.5rem'}}><Logo size={32} />Aula<span>Site</span></Link>
         <div className="nav-links">
           <a href="#segmentos">Para quien es</a>
           <a href="#planes">Planes</a>
@@ -148,7 +150,7 @@ export default function Landing() {
         <p className="legal">Aula Site es una plataforma de apoyo pedagogico y no un establecimiento educacional reconocido por el Ministerio de Educacion de Chile. No emitimos certificados de estudios ni promocion de alumnos. La validacion oficial de estudios se realiza exclusivamente mediante los Examenes Libres administrados por el Mineduc, con inscripcion del apoderado en el portal Ayuda Mineduc y evaluacion presencial en un establecimiento designado por el ministerio.</p>
       </footer>
 
-      <a className="wsp" href={WSP} target="_blank" rel="noreferrer" title="Escribenos por WhatsApp">💬</a>
+      <Chatbot />
     </div>
   )
 }

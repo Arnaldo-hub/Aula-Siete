@@ -13,8 +13,8 @@ class Settings(BaseSettings):
 
     @property
     def db_url(self) -> str:
-        # Render entrega 'postgres://'; SQLAlchemy necesita declarar el driver
-        # psycopg (v3) explícitamente, si no busca psycopg2 y falla.
+        # Render entrega 'postgres://'; SQLAlchemy necesita el driver psycopg (v3)
+        # declarado explicitamente, si no busca psycopg2 y falla (ModuleNotFoundError).
         url = self.database_url
         if url.startswith("postgres://"):
             return "postgresql+psycopg://" + url[len("postgres://"):]

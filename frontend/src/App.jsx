@@ -1,9 +1,13 @@
-import { Routes, Route, Navigate, NavLink, useNavigate, Link } from 'react-router-dom'
+import { Routes, Route, Navigate, NavLink } from 'react-router-dom'
+import Logo from './Logo'
+import Chatbot from './Chatbot'
 import Landing from './pages/Landing'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
+import Agenda from './pages/Agenda'
 import Biblioteca from './pages/Biblioteca'
 import Simulaciones from './pages/Simulaciones'
+import Dudas from './pages/Dudas'
 
 export function useAuth() {
   return {
@@ -18,16 +22,21 @@ function AppShell({ children }) {
   return (
     <div className="app">
       <aside className="sidebar">
-        <div className="brand">Aula<span>Site</span></div>
+        <div className="brand" style={{display: 'flex', alignItems: 'center', gap: '.6rem'}}>
+          <Logo size={30} /> Aula<span>Site</span>
+        </div>
         <div className="role">{role === 'apoderado' ? 'Portal del apoderado' : role === 'profesor' ? 'Portal del docente' : 'Administracion'}</div>
         <nav>
           <NavLink to="/app" end>📊 Panel</NavLink>
+          <NavLink to="/app/agenda">📅 Agenda</NavLink>
           <NavLink to="/app/biblioteca">🎬 Biblioteca</NavLink>
           <NavLink to="/app/simulaciones">📝 Simulaciones</NavLink>
+          <NavLink to="/app/dudas">💬 Dudas</NavLink>
         </nav>
         <div className="foot"><a href="#" onClick={logout}>Cerrar sesion</a></div>
       </aside>
       <main className="main">{children}</main>
+      <Chatbot />
     </div>
   )
 }
@@ -44,8 +53,10 @@ export default function App() {
       <Route path="/" element={<Landing />} />
       <Route path="/login" element={<Login />} />
       <Route path="/app" element={<Protected><Dashboard /></Protected>} />
+      <Route path="/app/agenda" element={<Protected><Agenda /></Protected>} />
       <Route path="/app/biblioteca" element={<Protected><Biblioteca /></Protected>} />
       <Route path="/app/simulaciones" element={<Protected><Simulaciones /></Protected>} />
+      <Route path="/app/dudas" element={<Protected><Dudas /></Protected>} />
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   )

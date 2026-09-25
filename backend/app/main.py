@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from .config import settings
 from .database import get_db, SessionLocal
 from . import models
-from .routers import auth, users, courses, classes, exams, reports, admin
+from .routers import auth, users, courses, classes, exams, reports, admin, doubts
 
 app = FastAPI(title="Aula Site API",
               description="Plataforma de apoyo pedagogico para Examenes Libres (Chile)",
@@ -19,7 +19,7 @@ app.add_middleware(
 )
 
 for r in (auth.router, users.router, courses.router,
-          classes.router, exams.router, reports.router, admin.router):
+          classes.router, exams.router, reports.router, admin.router, doubts.router):
     app.include_router(r)
 
 @app.get("/health")
