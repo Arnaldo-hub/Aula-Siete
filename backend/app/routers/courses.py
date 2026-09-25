@@ -25,6 +25,18 @@ class LessonIn(BaseModel):
     date: str
     content: dict = {}
 
+# ---- Catálogos ----
+@router.get("/subjects")
+def list_subjects(db: Session = Depends(get_db)):
+    return [{"id": s.id, "name": s.name, "level": s.level}
+            for s in db.query(models.Subject).all()]
+
+@router.get("/levels")
+def list_levels():
+    return ["PREKINDER", "KINDER", "BASICA_1", "BASICA_2", "BASICA_3", "BASICA_4",
+            "BASICA_5", "BASICA_6", "BASICA_7", "BASICA_8",
+            "MEDIA_1", "MEDIA_2", "MEDIA_3", "MEDIA_4"]
+
 @router.get("/courses")
 def list_courses(level: str | None = None, db: Session = Depends(get_db)):
     q = db.query(models.Course)
@@ -33,6 +45,37 @@ def list_courses(level: str | None = None, db: Session = Depends(get_db)):
     return [{"id": c.id, "title": c.title, "level": c.level,
              "description": c.description} for c in q.all()]
 
+# ---- Panel del profesor: mis cursos + alumnos ----
+@router.get("/my/courses")
+def my_courses(user: models.User = Depends(require_role("profesor", "admin")),
+               db: Session = Depends(get_db)):
+    rows = (db.query(models.Course)
+            .filter(models.Course.teacher_id == user.id)
+            .order_by(models.Course.id.desc()).all())
+    out = []
+    for c in rows:
+        count = db.query(models.Enrollment).filter_by(course_id=c.id).count()
+        subj = db.get(models.Subject, c.subject_id)
+        out.append({"id": c.id, "title": c.title, "level": c.level,
+                    "description": c.description, "students": count,
+                    "subject": subj.name if subj else ""})
+    return out
+
+@router.get("/courses/{course_id}/students")
+def course_students(course_id: int,
+                    user: models.User = Depends(require_role("profesor", "admin")),
+                    db: Session = Depends(get_db)):
+    c = db.get(models.Course, course_id)
+    if not c:
+        raise HTTPException(404, "Curso no encontrado")
+    if user.role == "profesor" and c.teacher_id != user.id:
+        raise HTTPException(403, "No es tu curso")
+    rows = (db.query(models.Student)
+            .join(models.Enrollment, models.Enrollment.student_id == models.Student.id)
+            .filter(models.Enrollment.course_id == course_id).all())
+    return [{"id": s.id, "level": s.level} for s in rows]
+
+# ---- Creación ----
 @router.post("/courses")
 def create_course(data: CourseIn,
                   user: models.User = Depends(require_role("profesor", "admin")),
@@ -58,6 +101,7 @@ def enroll(student_id: int, course_id: int,
     db.commit()
     return {"ok": True}
 
+# ---- Planificación académica ----
 @router.post("/plans")
 def create_plan(data: PlanIn, course_id: int,
                 user: models.User = Depends(require_role("profesor", "admin")),
