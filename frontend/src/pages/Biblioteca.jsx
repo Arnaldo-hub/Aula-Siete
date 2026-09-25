@@ -3,19 +3,22 @@ import { api } from '../api'
 
 export default function Biblioteca() {
   const [recs, setRecs] = useState([])
-  useEffect(() => { api('/recordings').then(setRecs).catch(() => {}) }, [])
+  const [err, setErr] = useState('')
+  useEffect(() => { api('/recordings').then(setRecs).catch(e => setErr(e.message)) }, [])
+
   return (
-    <main className="container">
-      <h2>Biblioteca de clases grabadas</h2>
+    <div>
+      <h2 className="page-title">Biblioteca de clases grabadas</h2>
+      {err && <div className="error">{err}</div>}
       <div className="grid">
         {recs.map(r => (
           <div className="card" key={r.id}>
-            <h4>{r.title}</h4>
-            <video controls src={r.video_url} style={{ width: '100%' }} />
+            <h3>{r.title}</h3>
+            <video controls src={r.video_url} />
           </div>
         ))}
-        {recs.length === 0 && <p className="muted">No hay grabaciones publicadas aún.</p>}
       </div>
-    </main>
+      {recs.length === 0 && !err && <div className="card muted">Aun no hay grabaciones publicadas.</div>}
+    </div>
   )
 }

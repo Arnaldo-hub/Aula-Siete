@@ -1,39 +1,54 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { login } from '../api'
 
 export default function Login() {
-  const [email, setEmail] = useState('apoderado@demo.cl')
-  const [password, setPassword] = useState('demo1234')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const nav = useNavigate()
 
   async function submit(e) {
     e.preventDefault()
+    setError('')
     try {
       const data = await login(email, password)
       localStorage.setItem('token', data.access_token)
       localStorage.setItem('role', data.role)
-      nav('/')
+      nav('/app')
     } catch (err) { setError(err.message) }
   }
 
   return (
     <div className="auth-wrap">
-      <form className="card" onSubmit={submit}>
-        <h1>Aula Site</h1>
-        <p className="muted">Apoyo pedagógico para Exámenes Libres · Chile</p>
-        {error && <p className="error">{error}</p>}
-        <input type="email" value={email} onChange={e => setEmail(e.target.value)}
-               placeholder="Correo" required />
-        <input type="password" value={password} onChange={e => setPassword(e.target.value)}
-               placeholder="Contraseña" required />
-        <button type="submit">Ingresar</button>
-        <p className="small muted">
-          La certificación oficial de estudios la emite el Mineduc mediante
-          Exámenes Libres. Aula Site prepara y acompaña.
-        </p>
-      </form>
+      <div className="auth-side">
+        <h2>Bienvenido al campus virtual</h2>
+        <p>Clases en vivo, biblioteca de grabaciones, simulaciones de Examenes Libres y reportes de progreso para tu familia.</p>
+        <ul>
+          <li>🎥 Clases online en vivo con docentes</li>
+          <li>📝 Simulaciones con evaluacion automatica</li>
+          <li>📈 Seguimiento del progreso en tiempo real</li>
+        </ul>
+      </div>
+      <div className="auth-card">
+        <form onSubmit={submit}>
+          <div className="brand">Aula<span>Site</span></div>
+          <p className="muted" style={{marginBottom:'1.6rem'}}>Apoyo pedagogico para Examenes Libres</p>
+          {error && <div className="error" style={{marginBottom:'1rem'}}>{error}</div>}
+          <label>Correo electronico</label>
+          <input type="email" value={email} onChange={e => setEmail(e.target.value)}
+                 placeholder="tu@correo.cl" required autoFocus />
+          <label>Contrasena</label>
+          <input type="password" value={password} onChange={e => setPassword(e.target.value)}
+                 placeholder="********" required />
+          <button type="submit" className="btn btn-primary btn-block">Ingresar</button>
+          <p className="auth-note">
+            La certificacion oficial de estudios la emite el Mineduc mediante Examenes
+            Libres presenciales. Aula Site prepara y acompana.{' '}
+            <Link to="/" style={{color:'var(--primary)'}}>Volver al inicio</Link>
+          </p>
+        </form>
+      </div>
     </div>
   )
 }

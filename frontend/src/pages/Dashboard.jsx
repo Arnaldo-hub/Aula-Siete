@@ -6,10 +6,8 @@ export default function Dashboard() {
   const [lives, setLives] = useState([])
   const [report, setReport] = useState(null)
   const [err, setErr] = useState('')
-  const role = localStorage.getItem('role')
 
   useEffect(() => {
-    if (!localStorage.getItem('token')) { location.href = '/login'; return }
     api('/users/students').then(setStudents).catch(e => setErr('Alumnos: ' + e.message))
     api('/live-classes').then(setLives).catch(e => setErr('Clases: ' + e.message))
   }, [])
@@ -20,59 +18,65 @@ export default function Dashboard() {
   }
 
   return (
-    <main className="container">
-      <h2>Panel {role === 'apoderado' ? 'del apoderado' : ''}</h2>
+    <div>
+      <h2 className="page-title">Panel</h2>
+      {err && <div className="error">Error de conexion con el servidor: {err}
+        <br /><small>Si el servicio estaba inactivo, espera 1 minuto y recarga.</small></div>}
 
-      {err && <div className="card error">Error de conexion con el servidor: {err}
-        <br /><small>Si el servicio estaba inactivo, espera 1 minuto y recarga la pagina.</small></div>}
-
-      {role === 'apoderado' && (
-        <section className="card">
-          <h3>Mis alumnos</h3>
-          {students.length === 0 && !err && <p className="muted">Aun no registras alumnos.</p>}
-          <ul>
+      <section className="card">
+        <h3>Mis alumnos</h3>
+        {students.length === 0 && !err && <p className="muted">Aun no registras alumnos.</p>}
+        <table>
+          <tbody>
             {students.map(s => (
-              <li key={s.id}>
-                Alumno #{s.id} - Nivel {s.level}{' '}
-                <button onClick={() => loadReport(s.id)}>Ver progreso</button>
-              </li>
+              <tr key={s.id}>
+                <td>Alumno #{s.id}</td>
+                <td>Nivel {s.level}</td>
+                <td style={{textAlign:'right'}}><button className="btn btn-primary btn-sm" onClick={() => loadReport(s.id)}>Ver progreso</button></td>
+              </tr>
             ))}
-          </ul>
-        </section>
-      )}
+          </tbody>
+        </table>
+      </section>
 
       {report && (
         <section className="card">
           <h3>Reporte de progreso</h3>
-          <p>Lecciones completadas: {report.lessons_completed} / {report.lessons_total}</p>
-          <p>Promedio simulaciones: {report.exam_average ?? '-'}%</p>
-          <ul>
-            {report.recent_attempts.map((a, i) => (
-              <li key={i}>{a.exam}: {a.score}% ({a.date?.slice(0, 10)})</li>
-            ))}
-          </ul>
+          <p>Lecciones completadas: <strong>{report.lessons_completed} / {report.lessons_total}</strong></p>
+          <p>Promedio simulaciones: <strong>{report.exam_average ?? '-'}%</strong></p>
+          <table>
+            <thead><tr><th>Simulacion</th><th>Puntaje</th><th>Fecha</th></tr></thead>
+            <tbody>
+              {report.recent_attempts.map((a, i) => (
+                <tr key={i}><td>{a.exam}</td><td>{a.score}%</td><td>{a.date?.slice(0, 10)}</td></tr>
+              ))}
+            </tbody>
+          </table>
         </section>
       )}
 
       <section className="card">
         <h3>Proximas clases en vivo</h3>
-        <ul>
-          {lives.map(l => (
-            <li key={l.id}>
-              {l.title} - {new Date(l.starts_at).toLocaleString('es-CL')}{' '}
-              <a className="btn-link" href={l.room_url} target="_blank" rel="noreferrer">Unirse</a>
-            </li>
-          ))}
-          {lives.length === 0 && <p className="muted">No hay clases programadas.</p>}
-        </ul>
+        {lives.length === 0 && <p className="muted">No hay clases programadas.</p>}
+        <table>
+          <tbody>
+            {lives.map(l => (
+              <tr key={l.id}>
+                <td>{l.title}</td>
+                <td>{new Date(l.starts_at).toLocaleString('es-CL')}</td>
+                <td style={{textAlign:'right'}}><a className="btn btn-primary btn-sm" href={l.room_url} target="_blank" rel="noreferrer">Unirse</a></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </section>
 
       <section className="card muted">
         <h3>Recordatorio importante</h3>
-        <p>La inscripcion oficial a Examenes Libres se realiza por el apoderado
-        en el portal <strong>Ayuda Mineduc</strong>. El Mineduc asigna el colegio
-        donde se rinde la prueba y emite el certificado oficial ante aprobacion.</p>
+        <p>La inscripcion oficial a Examenes Libres se realiza por el apoderado en el
+        portal <strong>Ayuda Mineduc</strong>. El Mineduc asigna el colegio donde se
+        rinde la prueba y emite el certificado oficial ante aprobacion.</p>
       </section>
-    </main>
+    </div>
   )
 }
