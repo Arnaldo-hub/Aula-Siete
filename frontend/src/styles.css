@@ -117,3 +117,28 @@ video{width:100%;border-radius:10px;background:#000}
   .main{margin-left:0;padding:1.2rem}
   .nav-links{display:none}
 }
+
+/* ===== Ola 1: planes, FAQ, whatsapp, segmentos ===== */
+.segments{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.4rem;max-width:900px;margin:0 auto}
+.segment{background:#fff;border:2px solid var(--border);border-radius:var(--radius);padding:2rem;text-align:center;transition:.2s}
+.segment:hover{border-color:var(--primary)}
+.segment h3{font-size:1.25rem;margin-bottom:.6rem}
+.segment p{color:var(--muted);margin-bottom:1.2rem;line-height:1.6}
+.plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.4rem;max-width:900px;margin:0 auto}
+.plan{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:2rem;box-shadow:var(--shadow);position:relative;display:flex;flex-direction:column}
+.plan.featured{border:2px solid var(--primary);box-shadow:var(--shadow-lg)}
+.plan .tag{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:.75rem;font-weight:700;padding:.3rem 1rem;border-radius:999px}
+.plan h3{font-size:1.15rem}
+.plan .price{font-size:2.2rem;font-weight:800;color:var(--primary);margin:.5rem 0 .1rem}
+.plan .per{color:var(--muted);font-size:.85rem;margin-bottom:1.2rem}
+.plan ul{list-style:none;display:grid;gap:.6rem;margin-bottom:1.6rem;text-align:left;font-size:.92rem;color:#334155}
+.plan li::before{content:"✓ ";color:#16a34a;font-weight:700}
+.plan .btn{margin-top:auto;justify-content:center}
+.faq{max-width:760px;margin:0 auto;display:grid;gap:.8rem}
+.faq details{background:#fff;border:1px solid var(--border);border-radius:12px;padding:1rem 1.3rem}
+.faq summary{cursor:pointer;font-weight:600;list-style:none;display:flex;justify-content:space-between;align-items:center}
+.faq summary::after{content:"+";font-size:1.3rem;color:var(--primary)}
+.faq details[open] summary::after{content:"–"}
+.faq p{margin-top:.8rem;color:var(--muted);font-size:.92rem;line-height:1.6}
+.wsp{position:fixed;right:22px;bottom:22px;width:58px;height:58px;border-radius:50%;background:#25d366;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(37,211,102,.45);z-index:99;font-size:1.7rem}
+.wsp:hover{transform:scale(1.08)}

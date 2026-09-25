@@ -1,6 +1,6 @@
 // URL de la API: en local usa el proxy de Vite (/api);
 // en Render se define VITE_API_URL=https://tu-backend.onrender.com/api
-const BASE = import.meta.env.VITE_API_URL || '/api'
+export const BASE = import.meta.env.VITE_API_URL || '/api'
 
 export function token() { return localStorage.getItem('token') }
 
