@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from .config import settings
 from .database import get_db, SessionLocal, Base, engine, migrate
 from . import models
-from .routers import auth, users, courses, classes, exams, reports, admin, doubts, libro, ai
+from .routers import auth, users, courses, classes, exams, reports, admin, doubts, libro, ai, payments
 
 migrate()
 Base.metadata.create_all(bind=engine)
@@ -22,7 +22,7 @@ app.add_middleware(
 )
 
 for r in (auth.router, users.router, courses.router,
-          classes.router, exams.router, reports.router, admin.router, doubts.router, libro.router, ai.router):
+          classes.router, exams.router, reports.router, admin.router, doubts.router, libro.router, ai.router, payments.router):
     app.include_router(r)
 
 @app.get("/health")

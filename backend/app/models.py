@@ -218,3 +218,14 @@ class PathItem(Base):
     title = Column(Text, nullable=False)
     status = Column(String(12), default="pending")   # pending / completed
     created_at = Column(DateTime(timezone=True), server_default="now()")
+
+class Subscription(Base):
+    __tablename__ = "subscriptions"
+    id = Column(BigInteger, primary_key=True)
+    student_id = Column(BigInteger, ForeignKey("students.id", ondelete="CASCADE"), nullable=False)
+    guardian_id = Column(BigInteger, ForeignKey("users.id"), nullable=False)
+    plan = Column(Text, nullable=False)                  # grupal / uno_a_uno
+    amount = Column(Numeric(10, 0), nullable=False)      # CLP
+    mp_preapproval_id = Column(Text)
+    status = Column(String(20), default="pending")       # pending/authorized/paused/cancelled
+    created_at = Column(DateTime(timezone=True), server_default="now()")
