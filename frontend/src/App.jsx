@@ -11,6 +11,7 @@ import Dudas from './pages/Dudas'
 import MisCursos from './pages/MisCursos'
 import Libro from './pages/Libro'
 import Ruta from './pages/Ruta'
+import Tutor from './pages/Tutor'
 
 export function useAuth() {
   return {
@@ -35,9 +36,10 @@ function AppShell({ children }) {
           <NavLink to="/app/biblioteca">🎬 Biblioteca</NavLink>
           <NavLink to="/app/simulaciones">📝 Simulaciones</NavLink>
           <NavLink to="/app/ruta">🎯 Mi Ruta</NavLink>
+          <NavLink to="/app/tutor">🤖 Tutor IA</NavLink>
           <NavLink to="/app/dudas">💬 Dudas</NavLink>
           {(role === 'profesor' || role === 'admin') && <NavLink to="/app/cursos">🧑‍🏫 Mis Cursos</NavLink>}
-          {(role === 'profesor' || role === 'admin') && <NavLink to="/app/libro">📒 Libro de Clases</NavLink>}
+          {/* LIBRO_PAUSADO: módulo B2B para colegios, se reactiva como segundo producto */}
         </nav>
         <div className="foot"><a href="#" onClick={logout}>Cerrar sesion</a></div>
       </aside>
@@ -63,6 +65,7 @@ export default function App() {
       <Route path="/app/biblioteca" element={<Protected><Biblioteca /></Protected>} />
       <Route path="/app/simulaciones" element={<Protected><Simulaciones /></Protected>} />
       <Route path="/app/ruta" element={<Protected><Ruta /></Protected>} />
+      <Route path="/app/tutor" element={<Protected><Tutor /></Protected>} />
       <Route path="/app/dudas" element={<Protected><Dudas /></Protected>} />
       <Route path="/app/cursos" element={<Protected><MisCursos /></Protected>} />
       <Route path="/app/libro" element={<Protected><Libro /></Protected>} />
