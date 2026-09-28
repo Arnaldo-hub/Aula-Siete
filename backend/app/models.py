@@ -139,3 +139,68 @@ class Doubt(Base):
     answer = Column(Text)
     created_at = Column(DateTime(timezone=True), server_default="now()")
     answered_at = Column(DateTime(timezone=True))
+
+# ===== Libro de Clases Digital =====
+class Classroom(Base):
+    __tablename__ = "classrooms"
+    id = Column(BigInteger, primary_key=True)
+    name = Column(Text, nullable=False)            # ej: "4 Básico B"
+    level = Column(Text, nullable=False)
+    year = Column(Integer, nullable=False)
+    school = Column(Text)
+    teacher_id = Column(BigInteger, ForeignKey("users.id"), nullable=False)
+
+class ClassroomStudent(Base):
+    __tablename__ = "classroom_students"
+    id = Column(BigInteger, primary_key=True)
+    classroom_id = Column(BigInteger, ForeignKey("classrooms.id", ondelete="CASCADE"), nullable=False)
+    first_name = Column(Text, nullable=False)
+    last_name = Column(Text, nullable=False)
+
+class Attendance(Base):
+    __tablename__ = "attendance"
+    __table_args__ = (UniqueConstraint("classroom_id", "student_id", "date"),)
+    id = Column(BigInteger, primary_key=True)
+    classroom_id = Column(BigInteger, ForeignKey("classrooms.id", ondelete="CASCADE"), nullable=False)
+    student_id = Column(BigInteger, ForeignKey("classroom_students.id", ondelete="CASCADE"), nullable=False)
+    date = Column(Date, nullable=False)
+    status = Column(String(1), nullable=False, default="P")   # P / A / R
+
+class Annotation(Base):
+    __tablename__ = "annotations"
+    id = Column(BigInteger, primary_key=True)
+    classroom_id = Column(BigInteger, ForeignKey("classrooms.id", ondelete="CASCADE"), nullable=False)
+    student_id = Column(BigInteger, ForeignKey("classroom_students.id", ondelete="CASCADE"), nullable=False)
+    date = Column(Date, nullable=False)
+    subject = Column(Text)
+    kind = Column(String(12), default="anotacion")  # positiva / negativa / entrevista
+    text = Column(Text, nullable=False)
+    guardian_informed = Column(Boolean, default=False)
+
+class PlanEntry(Base):
+    __tablename__ = "plan_entries"
+    id = Column(BigInteger, primary_key=True)
+    classroom_id = Column(BigInteger, ForeignKey("classrooms.id", ondelete="CASCADE"), nullable=False)
+    date = Column(Date, nullable=False)
+    block = Column(Text)                 # ej: "1ª hora"
+    objective = Column(Text)             # OA / OAT
+    activity = Column(Text)
+
+class Grade(Base):
+    __tablename__ = "grades"
+    id = Column(BigInteger, primary_key=True)
+    classroom_id = Column(BigInteger, ForeignKey("classrooms.id", ondelete="CASCADE"), nullable=False)
+    student_id = Column(BigInteger, ForeignKey("classroom_students.id", ondelete="CASCADE"), nullable=False)
+    subject = Column(Text, nullable=False)
+    title = Column(Text, nullable=False)
+    score = Column(Numeric(5, 2))
+    max_score = Column(Numeric(5, 2), default=7.0)
+    gdate = Column(Date, nullable=False)
+
+class Meeting(Base):
+    __tablename__ = "meetings"
+    id = Column(BigInteger, primary_key=True)
+    classroom_id = Column(BigInteger, ForeignKey("classrooms.id", ondelete="CASCADE"), nullable=False)
+    date = Column(Date, nullable=False)
+    topic = Column(Text, nullable=False)
+    agreements = Column(Text)
