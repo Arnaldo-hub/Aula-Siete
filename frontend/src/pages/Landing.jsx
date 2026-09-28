@@ -17,7 +17,7 @@ export default function Landing() {
   return (
     <div>
       <nav className="nav">
-        <Link to="/" className="logo" style={{display:'flex',alignItems:'center',gap:'.5rem'}}><Logo size={32} />Aula<span>Site</span></Link>
+        <Link to="/" className="logo" style={{display:'flex',alignItems:'center',gap:'.5rem'}}><Logo size={32} />Aula<span>Siete</span></Link>
         <div className="nav-links">
           <a href="#segmentos">Para quien es</a>
           <a href="#planes">Planes</a>
@@ -54,7 +54,7 @@ export default function Landing() {
       </section>
 
       <section id="segmentos" style={{background:'#fff'}}>
-        <h2 className="section-title">Para quien es Aula Site</h2>
+        <h2 className="section-title">Para quien es Aula Siete</h2>
         <p className="section-sub">Dos caminos, una misma meta: aprobar y validar estudios oficialmente.</p>
         <div className="segments">
           <div className="segment">
@@ -106,7 +106,7 @@ export default function Landing() {
 
       <section style={{background:'#fff'}}>
         <h2 className="section-title">Como funciona la validacion de estudios</h2>
-        <p className="section-sub">Aula Site es una institucion de apoyo pedagogico. La certificacion oficial la emite el Ministerio de Educacion mediante Examenes Libres presenciales.</p>
+        <p className="section-sub">Aula Siete es una institucion de apoyo pedagogico. La certificacion oficial la emite el Ministerio de Educacion mediante Examenes Libres presenciales.</p>
         <div className="steps">
           <div className="step"><h3>Apoyo online</h3><p>El estudiante toma clases en vivo, grabaciones y simulaciones en nuestra plataforma.</p></div>
           <div className="step"><h3>Inscripcion oficial</h3><p>El apoderado inscribe al alumno en el portal Ayuda Mineduc para rendir Examenes Libres.</p></div>
@@ -119,7 +119,7 @@ export default function Landing() {
         <h2 className="section-title">Preguntas frecuentes</h2>
         <p className="section-sub">Lo que toda familia nos pregunta antes de partir.</p>
         <div className="faq">
-          <details><summary>¿Es Aula Site un colegio?</summary><p>No. Somos una plataforma de apoyo pedagogico. En Chile el Mineduc no reconoce colegios 100% virtuales; la validacion de estudios se hace mediante Examenes Libres presenciales, y eso es exactamente para lo que preparamos a tu hijo.</p></details>
+          <details><summary>¿Es Aula Siete un colegio?</summary><p>No. Somos una plataforma de apoyo pedagogico. En Chile el Mineduc no reconoce colegios 100% virtuales; la validacion de estudios se hace mediante Examenes Libres presenciales, y eso es exactamente para lo que preparamos a tu hijo.</p></details>
           <details><summary>¿Ustedes emiten el certificado de estudios?</summary><p>No, y desconfia de quien lo prometa. El certificado con validez legal lo emite exclusivamente el Ministerio de Educacion despues de aprobar los Examenes Libres. Nosotros entregamos clases, simulaciones y reportes de preparacion.</p></details>
           <details><summary>¿Como inscribo a mi hijo en los Examenes Libres?</summary><p>La inscripcion la realiza el apoderado en el portal Ayuda Mineduc. Nosotros te orientamos paso a paso con las fechas y asignaturas que corresponden segun el nivel de tu hijo.</p></details>
           <details><summary>¿Que necesita mi hijo para tomar las clases?</summary><p>Un computador, tablet o celular con internet, y una cuenta de apoderado en nuestra plataforma. Las clases en vivo se realizan por videollamada con camara y microfono.</p></details>
@@ -146,8 +146,8 @@ export default function Landing() {
       </section>
 
       <footer>
-        <strong>AulaSite</strong> · Apoyo pedagogico para Examenes Libres · Chile
-        <p className="legal">Aula Site es una plataforma de apoyo pedagogico y no un establecimiento educacional reconocido por el Ministerio de Educacion de Chile. No emitimos certificados de estudios ni promocion de alumnos. La validacion oficial de estudios se realiza exclusivamente mediante los Examenes Libres administrados por el Mineduc, con inscripcion del apoderado en el portal Ayuda Mineduc y evaluacion presencial en un establecimiento designado por el ministerio.</p>
+        <strong>AulaSiete</strong> · Apoyo pedagogico para Examenes Libres · Chile
+        <p className="legal">Aula Siete es una plataforma de apoyo pedagogico y no un establecimiento educacional reconocido por el Ministerio de Educacion de Chile. No emitimos certificados de estudios ni promocion de alumnos. La validacion oficial de estudios se realiza exclusivamente mediante los Examenes Libres administrados por el Mineduc, con inscripcion del apoderado en el portal Ayuda Mineduc y evaluacion presencial en un establecimiento designado por el ministerio.</p>
       </footer>
 
       <Chatbot />

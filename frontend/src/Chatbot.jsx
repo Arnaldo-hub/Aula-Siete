@@ -39,7 +39,7 @@ function answer(text) {
 export default function Chatbot() {
   const [open, setOpen] = useState(false)
   const [msgs, setMsgs] = useState([
-    { from: 'bot', text: 'Hola, soy el asistente de Aula Site. Preguntame por precios, clases, Examenes Libres o niveles.' }
+    { from: 'bot', text: 'Hola, soy el asistente de Aula Siete. Preguntame por precios, clases, Examenes Libres o niveles.' }
   ])
   const [input, setInput] = useState('')
   const boxRef = useRef(null)
@@ -65,7 +65,7 @@ export default function Chatbot() {
       {open && (
         <div className="chat-panel">
           <div className="chat-head">
-            <strong>Asistente Aula Site</strong>
+            <strong>Asistente Aula Siete</strong>
             <button onClick={() => setOpen(false)} aria-label="Cerrar">✕</button>
           </div>
           <div className="chat-body" ref={boxRef}>

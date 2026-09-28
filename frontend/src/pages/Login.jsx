@@ -33,7 +33,7 @@ export default function Login() {
       </div>
       <div className="auth-card">
         <form onSubmit={submit}>
-          <div className="brand" style={{display:'flex',alignItems:'center',gap:'.5rem'}}><Logo size={34} />Aula<span>Site</span></div>
+          <div className="brand" style={{display:'flex',alignItems:'center',gap:'.5rem'}}><Logo size={34} />Aula<span>Siete</span></div>
           <p className="muted" style={{marginBottom:'1.6rem'}}>Apoyo pedagogico para Examenes Libres</p>
           {error && <div className="error" style={{marginBottom:'1rem'}}>{error}</div>}
           <label>Correo electronico</label>
@@ -45,7 +45,7 @@ export default function Login() {
           <button type="submit" className="btn btn-primary btn-block">Ingresar</button>
           <p className="auth-note">
             La certificacion oficial de estudios la emite el Mineduc mediante Examenes
-            Libres presenciales. Aula Site prepara y acompana.{' '}
+            Libres presenciales. Aula Siete prepara y acompana.{' '}
             <Link to="/" style={{color:'var(--primary)'}}>Volver al inicio</Link>
           </p>
         </form>

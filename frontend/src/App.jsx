@@ -25,7 +25,7 @@ function AppShell({ children }) {
     <div className="app">
       <aside className="sidebar">
         <div className="brand" style={{display: 'flex', alignItems: 'center', gap: '.6rem'}}>
-          <Logo size={30} /> Aula<span>Site</span>
+          <Logo size={30} /> Aula<span>Siete</span>
         </div>
         <div className="role">{role === 'apoderado' ? 'Portal del apoderado' : role === 'profesor' ? 'Portal del docente' : 'Administracion'}</div>
         <nav>

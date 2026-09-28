@@ -7,6 +7,15 @@ const TABS = [
 ]
 const fld = { width: '100%', padding: '.6rem .8rem', borderRadius: '10px', border: '1.5px solid var(--border)', marginBottom: '.7rem', fontFamily: 'inherit' }
 
+import { useEffect, useMemo, useState } from 'react'
+import { api } from '../api'
+
+const TABS = [
+  ['alumnos', 'Alumnos'], ['asistencia', 'Asistencia'], ['plan', 'Planificacion'],
+  ['notas', 'Notas'], ['anotaciones', 'Anotaciones'], ['reuniones', 'Reuniones']
+]
+const fld = { width: '100%', padding: '.6rem .8rem', borderRadius: '10px', border: '1.5px solid var(--border)', marginBottom: '.7rem', fontFamily: 'inherit' }
+
 export default function Libro() {
   const [classrooms, setClassrooms] = useState([])
   const [cid, setCid] = useState(null)
@@ -14,73 +23,107 @@ export default function Libro() {
   const [tab, setTab] = useState('asistencia')
   const [msg, setMsg] = useState('')
   const [err, setErr] = useState('')
+  const [creating, setCreating] = useState(false)
 
-  const loadClassrooms = () => api('/libro/classrooms').then(cs => {
-    setClassrooms(cs)
-    if (!cid && cs.length) setCid(cs[0].id)
-  }).catch(e => setErr(e.message))
-  const loadStudents = () => { if (cid) api(`/libro/classrooms/${cid}/students`).then(setStudents).catch(() => {}) }
+  function loadClassrooms() {
+    return api('/libro/classrooms').then(cs => setClassrooms(cs)).catch(e => setErr(e.message))
+  }
+  function loadStudents() {
+    if (cid) api(`/libro/classrooms/${cid}/students`).then(setStudents).catch(() => {})
+  }
   useEffect(() => { loadClassrooms() }, [])
   useEffect(() => { setMsg(''); setErr(''); loadStudents() }, [cid])
 
+  const current = classrooms.find(c => c.id === cid)
+
+  // ----- Vista 1: sin curso seleccionado -> lista de cursos como tarjetas -----
+  if (!cid) {
+    return (
+      <div>
+        <h2 className="page-title">Libro de Clases Digital</h2>
+        {err && <div className="error">{err}</div>}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.2rem' }}>
+          <p className="muted" style={{ margin: 0 }}>Elige un curso para abrir su libro, o crea uno nuevo.</p>
+          <button className="btn btn-primary btn-sm" onClick={() => setCreating(!creating)}>
+            {creating ? 'Cerrar formulario' : '+ Nuevo curso'}
+          </button>
+        </div>
+
+        {creating && (
+          <section className="card">
+            <h3>Crear curso</h3>
+            <NewClassroom onDone={id => { setCreating(false); loadClassrooms().then(() => setCid(id)) }} />
+          </section>
+        )}
+
+        {classrooms.length === 0 && !creating && (
+          <div className="card" style={{ textAlign: 'center', padding: '3rem' }}>
+            <p style={{ fontSize: '2.5rem', margin: 0 }}>📒</p>
+            <h3>Aun no tienes cursos</h3>
+            <p className="muted">Crea tu primer curso para comenzar el libro de clases digital.<br />
+            Ejemplo: curso "4 Básico B", año 2026, Colegio El Tabo.</p>
+            <button className="btn btn-primary" onClick={() => setCreating(true)}>+ Crear mi primer curso</button>
+          </div>
+        )}
+
+        <div className="grid">
+          {classrooms.map(c => (
+            <div className="card" key={c.id} style={{ cursor: 'pointer' }} onClick={() => setCid(c.id)}>
+              <h3 style={{ margin: '0 0 .4rem' }}>📒 {c.name}</h3>
+              <p className="muted" style={{ margin: 0 }}>{c.level} · Año {c.year}{c.school ? ' · ' + c.school : ''}</p>
+              <button className="btn btn-outline btn-sm" style={{ marginTop: '1rem' }}>Abrir libro</button>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  // ----- Vista 2: curso abierto -> pestañas del libro -----
   return (
     <div>
-      <h2 className="page-title">Libro de Clases Digital</h2>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap', marginBottom: '1.4rem' }}>
+        <button className="btn btn-outline btn-sm" onClick={() => setCid(null)}>← Volver a cursos</button>
+        <h2 className="page-title" style={{ margin: 0 }}>📒 {current ? current.name : ''}</h2>
+        <span className="chip" style={{ fontSize: '.8rem' }}>{current ? `${current.level} · ${current.year}${current.school ? ' · ' + current.school : ''}` : ''}</span>
+      </div>
       {msg && <div className="card ok">{msg}</div>}
       {err && <div className="error">{err}</div>}
 
-      <section className="card">
-        <div style={{ display: 'flex', gap: '.8rem', flexWrap: 'wrap', alignItems: 'center' }}>
-          <select value={cid || ''} onChange={e => setCid(Number(e.target.value))} style={{ ...fld, width: 'auto', margin: 0 }}>
-            {classrooms.map(c => <option key={c.id} value={c.id}>{c.name} - {c.year}{c.school ? ' - ' + c.school : ''}</option>)}
-          </select>
-          <NewClassroom onDone={id => { loadClassrooms().then(() => setCid(id)) }} />
-        </div>
-      </section>
-
-      {!cid && <div className="card muted">Crea tu primer curso para comenzar tu libro de clases.</div>}
-
-      {cid && (
-        <>
-          <div style={{ display: 'flex', gap: '.4rem', flexWrap: 'wrap', marginBottom: '1.2rem' }}>
-            {TABS.map(([k, label]) => (
-              <button key={k} className="btn btn-sm" onClick={() => setTab(k)}
-                style={tab === k ? { background: 'var(--primary)', color: '#fff' } : { background: '#fff', color: 'var(--ink)', border: '1px solid var(--border)' }}>
-                {label}
-              </button>
-            ))}
-          </div>
-          {tab === 'alumnos' && <Alumnos cid={cid} students={students} reload={loadStudents} setMsg={setMsg} setErr={setErr} />}
-          {tab === 'asistencia' && <Asistencia cid={cid} students={students} setMsg={setMsg} setErr={setErr} />}
-          {tab === 'plan' && <Plan cid={cid} setMsg={setMsg} setErr={setErr} />}
-          {tab === 'notas' && <Notas cid={cid} students={students} setMsg={setMsg} setErr={setErr} />}
-          {tab === 'anotaciones' && <Anotaciones cid={cid} students={students} setMsg={setMsg} setErr={setErr} />}
-          {tab === 'reuniones' && <Reuniones cid={cid} setMsg={setMsg} setErr={setErr} />}
-        </>
-      )}
+      <div style={{ display: 'flex', gap: '.4rem', flexWrap: 'wrap', marginBottom: '1.2rem' }}>
+        {TABS.map(([k, label]) => (
+          <button key={k} className="btn btn-sm" onClick={() => setTab(k)}
+            style={tab === k ? { background: 'var(--primary)', color: '#fff' } : { background: '#fff', color: 'var(--ink)', border: '1px solid var(--border)' }}>
+            {label}
+          </button>
+        ))}
+      </div>
+      {tab === 'alumnos' && <Alumnos cid={cid} students={students} reload={loadStudents} setMsg={setMsg} setErr={setErr} />}
+      {tab === 'asistencia' && <Asistencia cid={cid} students={students} setMsg={setMsg} setErr={setErr} />}
+      {tab === 'plan' && <Plan cid={cid} setMsg={setMsg} setErr={setErr} />}
+      {tab === 'notas' && <Notas cid={cid} students={students} setMsg={setMsg} setErr={setErr} />}
+      {tab === 'anotaciones' && <Anotaciones cid={cid} students={students} setMsg={setMsg} setErr={setErr} />}
+      {tab === 'reuniones' && <Reuniones cid={cid} setMsg={setMsg} setErr={setErr} />}
     </div>
   )
 }
 
 function NewClassroom({ onDone }) {
   const [f, setF] = useState({ name: '', level: 'BASICA_4', year: 2026, school: '' })
-  const [open, setOpen] = useState(false)
   async function create(e) {
     e.preventDefault()
     const r = await api('/libro/classrooms', { method: 'POST', body: { ...f, year: Number(f.year) } })
-    setOpen(false); onDone(r.id)
+    onDone(r.id)
   }
-  if (!open) return <button className="btn btn-outline btn-sm" onClick={() => setOpen(true)}>+ Nuevo curso</button>
   return (
     <form onSubmit={create} style={{ display: 'flex', gap: '.5rem', flexWrap: 'wrap' }}>
-      <input style={{ ...fld, width: '160px', margin: 0 }} placeholder="Curso (ej: 4 Basico B)" value={f.name} onChange={e => setF({ ...f, name: e.target.value })} required />
-      <select style={{ ...fld, width: '130px', margin: 0 }} value={f.level} onChange={e => setF({ ...f, level: e.target.value })}>
+      <input style={{ ...fld, width: '170px', margin: 0 }} placeholder="Nombre del curso (ej: 4 Básico B)" value={f.name} onChange={e => setF({ ...f, name: e.target.value })} required />
+      <select style={{ ...fld, width: '140px', margin: 0 }} value={f.level} onChange={e => setF({ ...f, level: e.target.value })}>
         {['PREKINDER','KINDER','BASICA_1','BASICA_2','BASICA_3','BASICA_4','BASICA_5','BASICA_6','BASICA_7','BASICA_8','MEDIA_1','MEDIA_2','MEDIA_3','MEDIA_4'].map(l => <option key={l}>{l}</option>)}
       </select>
       <input style={{ ...fld, width: '90px', margin: 0 }} type="number" value={f.year} onChange={e => setF({ ...f, year: e.target.value })} required />
-      <input style={{ ...fld, width: '160px', margin: 0 }} placeholder="Establecimiento" value={f.school} onChange={e => setF({ ...f, school: e.target.value })} />
-      <button className="btn btn-primary btn-sm" type="submit">Crear</button>
-      <button className="btn btn-sm" type="button" onClick={() => setOpen(false)} style={{ background: '#fff', border: '1px solid var(--border)' }}>Cancelar</button>
+      <input style={{ ...fld, width: '180px', margin: 0 }} placeholder="Establecimiento (ej: Colegio El Tabo)" value={f.school} onChange={e => setF({ ...f, school: e.target.value })} />
+      <button className="btn btn-primary btn-sm" type="submit">Crear curso</button>
     </form>
   )
 }
