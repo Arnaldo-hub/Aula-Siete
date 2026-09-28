@@ -93,6 +93,7 @@ class Material(Base):
     title = Column(Text, nullable=False)
     file_url = Column(Text, nullable=False)
     file_type = Column(String)
+    oa = Column(String)                        # codigo OA que refuerza
 
 class Exam(Base):
     __tablename__ = "exams"
@@ -102,6 +103,7 @@ class Exam(Base):
     title = Column(Text, nullable=False)
     time_limit_min = Column(Integer, default=90)
     is_simulation = Column(Boolean, default=True)
+    kind = Column(String(20), default="simulacro")   # diagnostico / simulacro / paes
 
 class Question(Base):
     __tablename__ = "questions"
@@ -111,6 +113,8 @@ class Question(Base):
     options = Column(JSON, nullable=False)
     answer = Column(String, nullable=False)
     skill = Column(String)
+    difficulty = Column(Integer, default=2)   # 1 facil / 2 media / 3 dificil
+    oa = Column(String)                        # codigo OA del curriculo (ej: OA 13)
     order_idx = Column(Integer, default=0)
 
 class ExamAttempt(Base):
@@ -204,3 +208,13 @@ class Meeting(Base):
     date = Column(Date, nullable=False)
     topic = Column(Text, nullable=False)
     agreements = Column(Text)
+
+class PathItem(Base):
+    __tablename__ = "path_items"
+    id = Column(BigInteger, primary_key=True)
+    student_id = Column(BigInteger, ForeignKey("students.id", ondelete="CASCADE"), nullable=False)
+    oa = Column(Text, nullable=False)
+    material_id = Column(BigInteger, ForeignKey("materials.id", ondelete="SET NULL"))
+    title = Column(Text, nullable=False)
+    status = Column(String(12), default="pending")   # pending / completed
+    created_at = Column(DateTime(timezone=True), server_default="now()")

@@ -2,11 +2,14 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from .config import settings
-from .database import get_db, SessionLocal
+from .database import get_db, SessionLocal, Base, engine, migrate
 from . import models
 from .routers import auth, users, courses, classes, exams, reports, admin, doubts, libro
 
-app = FastAPI(title="Aula Site API",
+migrate()
+Base.metadata.create_all(bind=engine)
+
+app = FastAPI(title="Aula Siete API",
               description="Plataforma de apoyo pedagogico para Examenes Libres (Chile)",
               version="1.0.0")
 

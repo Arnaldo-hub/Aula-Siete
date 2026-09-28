@@ -42,11 +42,13 @@ def add_question(exam_id: int, data: QuestionIn,
 
 # ---- Catálogo de simulaciones ----
 @router.get("")
-def catalog(level: str | None = None, db: Session = Depends(get_db)):
+def catalog(level: str | None = None, kind: str | None = None, db: Session = Depends(get_db)):
     q = db.query(models.Exam).filter_by(is_simulation=True)
     if level:
         q = q.filter_by(level=level)
-    return [{"id": e.id, "title": e.title, "level": e.level,
+    if kind:
+        q = q.filter_by(kind=kind)
+    return [{"id": e.id, "title": e.title, "level": e.level, "kind": e.kind,
              "time_limit_min": e.time_limit_min} for e in q.all()]
 
 # ---- Rendición: entrega SOLO las preguntas, nunca la respuesta ----
@@ -76,3 +78,60 @@ def submit(exam_id: int, student_id: int, answers: dict[str, str],
     db.add(att); db.commit(); db.refresh(att)
     return {"attempt_id": att.id, "score": score, "total": len(qs),
             "correct": correct}
+
+
+def _build_path(db: Session, student_id: int, exam_id: int, answers: dict) -> list:
+    """A partir de las respuestas del diagnostico, crea items de ruta por OA debil."""
+    qs = db.query(models.Question).filter_by(exam_id=exam_id).all()
+    weak = []
+    for q in qs:
+        if answers.get(str(q.id)) != q.answer and q.oa:
+            weak.append(q.oa)
+    weak = list(dict.fromkeys(weak))   # unicos, conservando orden
+    created = []
+    for oa in weak:
+        exists = db.query(models.PathItem).filter_by(student_id=student_id, oa=oa,
+                                                     status="pending").first()
+        if exists:
+            continue
+        mats = db.query(models.Material).filter_by(oa=oa).limit(2).all()
+        if mats:
+            for m in mats:
+                db.add(models.PathItem(student_id=student_id, oa=oa, material_id=m.id,
+                                       title=f"Reforzar {oa}: {m.title}"))
+        else:
+            db.add(models.PathItem(student_id=student_id, oa=oa, material_id=None,
+                                   title=f"Reforzar {oa}: pide al docente material de esta unidad"))
+        created.append(oa)
+    db.commit()
+    return created
+
+
+class PathDone(BaseModel):
+    pass
+
+
+@router.get("/path/{student_id}")
+def my_path(student_id: int,
+            user: models.User = Depends(require_role("apoderado", "admin", "alumno")),
+            db: Session = Depends(get_db)):
+    if user.role == "apoderado":
+        guardian_of(student_id, user, db)
+    rows = (db.query(models.PathItem).filter_by(student_id=student_id)
+            .order_by(models.PathItem.id.desc()).limit(60).all())
+    return [{"id": r.id, "oa": r.oa, "title": r.title, "status": r.status,
+             "material_id": r.material_id} for r in rows]
+
+
+@router.post("/path/{item_id}/done")
+def path_done(item_id: int,
+              user: models.User = Depends(require_role("apoderado", "admin", "alumno")),
+              db: Session = Depends(get_db)):
+    item = db.get(models.PathItem, item_id)
+    if not item:
+        raise HTTPException(404, "Item no encontrado")
+    if user.role == "apoderado":
+        guardian_of(item.student_id, user, db)
+    item.status = "completed"
+    db.commit()
+    return {"ok": True}

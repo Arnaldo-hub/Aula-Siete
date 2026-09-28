@@ -3,12 +3,19 @@ import { api } from '../api'
 
 export default function Simulaciones() {
   const [exams, setExams] = useState([])
+  const [diags, setDiags] = useState([])
+  const [weak, setWeak] = useState(null)
   const [active, setActive] = useState(null)
   const [answers, setAnswers] = useState({})
   const [result, setResult] = useState(null)
   const [err, setErr] = useState('')
 
-  useEffect(() => { api('/exams').then(setExams).catch(e => setErr(e.message)) }, [])
+  useEffect(() => {
+    api('/exams').then(all => {
+      setExams(all.filter(e => e.kind !== 'diagnostico'))
+      setDiags(all.filter(e => e.kind === 'diagnostico'))
+    }).catch(e => setErr(e.message))
+  }, [])
 
   async function start(id) {
     try {
@@ -22,7 +29,7 @@ export default function Simulaciones() {
     try {
       const r = await api(`/exams/${active.exam_id}/submit?student_id=${sid}`,
         { method: 'POST', body: answers })
-      setResult(r); setActive(null)
+      setResult(r); setActive(null); setWeak(r.weak_oa || null)
     } catch (e) { setErr(e.message) }
   }
 
@@ -38,6 +45,31 @@ export default function Simulaciones() {
           <h3>Resultado: {result.score}%</h3>
           <p className="muted">{result.correct} de {result.total} respuestas correctas.</p>
         </div>
+      )}
+
+      {weak && (
+        <div className="card">
+          <h3>OA debiles detectados - tu ruta fue creada</h3>
+          <p className="muted">Revisa la pestana "Mi Ruta" en el menu para ver las micro-tareas asignadas.</p>
+          <div>{weak.map(o => <span key={o} className="chip" style={{ display: 'inline-block', margin: '0 .5rem .5rem 0', background: '#fef2f2', borderColor: '#fecaca' }}>{o}</span>)}</div>
+        </div>
+      )}
+
+      {diags.length > 0 && !active && (
+        <section className="card">
+          <h3>Diagnósticos de ingreso</h3>
+          <p className="muted">Rindelos primero: detectamos tus vacios y creamos tu ruta personalizada.</p>
+          <table>
+            <tbody>
+              {diags.map(e => (
+                <tr key={e.id}>
+                  <td>{e.title}</td>
+                  <td style={{ textAlign: 'right' }}><button className="btn btn-accent btn-sm" onClick={() => start(e.id)}>Rendir diagnóstico</button></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
       )}
 
       {!active ? (

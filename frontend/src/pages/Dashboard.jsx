@@ -44,6 +44,10 @@ export default function Dashboard() {
           <h3>Reporte de progreso</h3>
           <p>Lecciones completadas: <strong>{report.lessons_completed} / {report.lessons_total}</strong></p>
           <p>Promedio simulaciones: <strong>{report.exam_average ?? '-'}%</strong> · Puntos de practica: <strong>{report.points ?? 0}</strong> ⭐</p>
+          {report.ranking_position && <p>Ranking de practica: <strong>#{report.ranking_position}</strong> de {report.ranking_total} alumnos</p>}
+          {report.badges && report.badges.length > 0 && (
+            <p style={{ marginTop: '.5rem' }}>{report.badges.map(b => <span key={b} className="chip" style={{ display: 'inline-block', margin: '0 .4rem .4rem 0', background: '#fef9c3', borderColor: '#fde047' }}>🏅 {b}</span>)}</p>
+          )}
           <table>
             <thead><tr><th>Simulacion</th><th>Puntaje</th><th>Fecha</th></tr></thead>
             <tbody>
