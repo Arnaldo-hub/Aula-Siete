@@ -7,15 +7,6 @@ const TABS = [
 ]
 const fld = { width: '100%', padding: '.6rem .8rem', borderRadius: '10px', border: '1.5px solid var(--border)', marginBottom: '.7rem', fontFamily: 'inherit' }
 
-import { useEffect, useMemo, useState } from 'react'
-import { api } from '../api'
-
-const TABS = [
-  ['alumnos', 'Alumnos'], ['asistencia', 'Asistencia'], ['plan', 'Planificacion'],
-  ['notas', 'Notas'], ['anotaciones', 'Anotaciones'], ['reuniones', 'Reuniones']
-]
-const fld = { width: '100%', padding: '.6rem .8rem', borderRadius: '10px', border: '1.5px solid var(--border)', marginBottom: '.7rem', fontFamily: 'inherit' }
-
 export default function Libro() {
   const [classrooms, setClassrooms] = useState([])
   const [cid, setCid] = useState(null)
