@@ -3,6 +3,7 @@ import Logo from './Logo'
 import Chatbot from './Chatbot'
 import Landing from './pages/Landing'
 import Login from './pages/Login'
+import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
 import Agenda from './pages/Agenda'
 import Biblioteca from './pages/Biblioteca'
@@ -62,6 +63,7 @@ export default function App() {
     <Routes>
       <Route path="/" element={<Landing />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/registro" element={<Register />} />
       <Route path="/app" element={<Protected><Dashboard /></Protected>} />
       <Route path="/app/agenda" element={<Protected><Agenda /></Protected>} />
       <Route path="/app/biblioteca" element={<Protected><Biblioteca /></Protected>} />

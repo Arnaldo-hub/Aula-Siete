@@ -44,7 +44,9 @@ export default function Login() {
                  placeholder="********" required />
           <button type="submit" className="btn btn-primary btn-block">Ingresar</button>
           <p className="auth-note">
-            La certificacion oficial de estudios la emite el Mineduc mediante Examenes
+            ¿No tienes cuenta? <Link to="/registro" style={{ color: 'var(--primary)' }}>Regístrate gratis</Link>
+            <br />
+            La certificación oficial de estudios la emite el Mineduc mediante Exámenes
             Libres presenciales. Aula Siete prepara y acompaña.{' '}
             <Link to="/" style={{color:'var(--primary)'}}>Volver al inicio</Link>
           </p>

@@ -23,7 +23,8 @@ export default function Landing() {
           <a href="#planes">Planes</a>
           <a href="#faq">Preguntas</a>
         </div>
-        <Link to="/login" className="btn btn-primary btn-sm" style={{marginLeft:'1rem'}}>Ingresar</Link>
+        <Link to="/registro" className="btn btn-outline btn-sm" style={{marginLeft:'1rem'}}>Crear cuenta</Link>
+        <Link to="/login" className="btn btn-primary btn-sm" style={{marginLeft:'.5rem'}}>Ingresar</Link>
       </nav>
 
       <header className="hero">
@@ -31,7 +32,7 @@ export default function Landing() {
         <h1>Prepara a tu hijo para los <em>Examenes Libres</em> con clases online en vivo</h1>
         <p>Clases en vivo en grupos reducidos, biblioteca de grabaciones, simulaciones de examen y reportes para el apoderado. La certificacion oficial la emite el Mineduc; nosotros preparamos para aprobar.</p>
         <div className="hero-cta">
-          <a href={WSP} target="_blank" rel="noreferrer" className="btn btn-accent">Agenda una clase de prueba gratis</a>
+          <Link to="/registro" className="btn btn-accent">Crea tu cuenta gratis</Link>
           <a href="#planes" className="btn btn-outline">Ver planes</a>
         </div>
         <div className="stats">
@@ -141,7 +142,7 @@ export default function Landing() {
         <div className="cta-final">
           <h2>La primera clase de prueba es gratis</h2>
           <p>Crea tu cuenta como apoderado, registra a tu hijo y mira como rinde su primera simulacion.</p>
-          <a className="btn btn-accent" href={WSP} target="_blank" rel="noreferrer">Agendar clase de prueba</a>
+          <Link to="/registro" className="btn btn-accent">Crear cuenta gratis</Link>
         </div>
       </section>
 
