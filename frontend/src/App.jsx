@@ -4,6 +4,7 @@ import Chatbot from './Chatbot'
 import Landing from './pages/Landing'
 import Login from './pages/Login'
 import Register from './pages/Register'
+import AdminPanel from './pages/AdminPanel'
 import Dashboard from './pages/Dashboard'
 import Agenda from './pages/Agenda'
 import Biblioteca from './pages/Biblioteca'
@@ -44,6 +45,9 @@ function AppShell({ children }) {
           {(role === 'profesor' || role === 'admin') && <NavLink to="/app/cursos">🧑‍🏫 Mis Cursos</NavLink>}
           {/* LIBRO_PAUSADO: módulo B2B para colegios, se reactiva como segundo producto */}
         </nav>
+        <nav>
+          {role === 'admin' && <NavLink to="/app/admin" style={{ color: '#fbbf24' }}>⚙️ Panel admin</NavLink>}
+        </nav>
         <div className="foot"><a href="#" onClick={logout}>Cerrar sesion</a></div>
       </aside>
       <main className="main">{children}</main>
@@ -71,6 +75,7 @@ export default function App() {
       <Route path="/app/ruta" element={<Protected><Ruta /></Protected>} />
       <Route path="/app/tutor" element={<Protected><Tutor /></Protected>} />
       <Route path="/app/suscripcion" element={<Protected><Suscripcion /></Protected>} />
+      <Route path="/app/admin" element={<Protected><AdminPanel /></Protected>} />
       <Route path="/app/dudas" element={<Protected><Dudas /></Protected>} />
       <Route path="/app/cursos" element={<Protected><MisCursos /></Protected>} />
       <Route path="/app/libro" element={<Protected><Libro /></Protected>} />
