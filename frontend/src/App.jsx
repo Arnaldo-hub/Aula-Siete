@@ -84,10 +84,12 @@ function Protected({ children }) {
   return <AppShell>{children}</AppShell>
 }
 
-// Redirige la raiz /app segun el rol
+// Raiz /app segun el rol: admin y profesor van a su pantalla; apoderado ve su Panel aqui mismo
 function RoleHome() {
   const { role } = useAuth()
-  return <Navigate to={HOME[role] || '/app'} replace />
+  if (role === 'admin') return <Navigate to="/app/admin" replace />
+  if (role === 'profesor') return <Navigate to="/app/cursos" replace />
+  return <Dashboard />
 }
 
 export default function App() {
