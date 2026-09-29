@@ -7,6 +7,7 @@ export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [showPwd, setShowPwd] = useState(false)
   const nav = useNavigate()
 
   async function submit(e) {
@@ -39,9 +40,15 @@ export default function Login() {
           <label>Correo electronico</label>
           <input type="email" value={email} onChange={e => setEmail(e.target.value)}
                  placeholder="tu@correo.cl" required autoFocus />
-          <label>Contrasena</label>
-          <input type="password" value={password} onChange={e => setPassword(e.target.value)}
-                 placeholder="********" required />
+          <label>Contraseña</label>
+          <div className="pwd-field">
+            <input type={showPwd ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)}
+                   placeholder="********" required autoComplete="current-password" />
+            <button type="button" className="pwd-eye" onClick={() => setShowPwd(!showPwd)}
+                    title={showPwd ? 'Ocultar contraseña' : 'Ver contraseña'}>
+              {showPwd ? '🙈' : '👁️'}
+            </button>
+          </div>
           <button type="submit" className="btn btn-primary btn-block">Ingresar</button>
           <p className="auth-note">
             ¿No tienes cuenta? <Link to="/registro" style={{ color: 'var(--primary)' }}>Regístrate gratis</Link>

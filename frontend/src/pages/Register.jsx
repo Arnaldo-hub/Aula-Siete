@@ -6,6 +6,7 @@ import { BASE } from '../api'
 export default function Register() {
   const [f, setF] = useState({ full_name: '', email: '', password: '' })
   const [error, setError] = useState('')
+  const [showPwd, setShowPwd] = useState(false)
   const [ok, setOk] = useState(false)
   const nav = useNavigate()
 
@@ -53,8 +54,14 @@ export default function Register() {
           <input type="email" value={f.email} onChange={e => setF({ ...f, email: e.target.value })}
                  placeholder="tu@correo.cl" required />
           <label>Contraseña</label>
-          <input type="password" value={f.password} onChange={e => setF({ ...f, password: e.target.value })}
-                 placeholder="Mínimo 8 caracteres" minLength={8} required />
+          <div className="pwd-field">
+            <input type={showPwd ? 'text' : 'password'} value={f.password} onChange={e => setF({ ...f, password: e.target.value })}
+                   placeholder="Mínimo 8 caracteres" minLength={8} required autoComplete="new-password" />
+            <button type="button" className="pwd-eye" onClick={() => setShowPwd(!showPwd)}
+                    title={showPwd ? 'Ocultar contraseña' : 'Ver contraseña'}>
+              {showPwd ? '🙈' : '👁️'}
+            </button>
+          </div>
           <button type="submit" className="btn btn-primary btn-block">Crear mi cuenta gratis</button>
           <p className="auth-note">
             ¿Ya tienes cuenta? <Link to="/login" style={{ color: 'var(--primary)' }}>Inicia sesión aquí</Link>
