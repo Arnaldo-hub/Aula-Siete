@@ -4,7 +4,6 @@ import Chatbot from './Chatbot'
 import Landing from './pages/Landing'
 import Login from './pages/Login'
 import Register from './pages/Register'
-import AdminPanel from './pages/AdminPanel'
 import Dashboard from './pages/Dashboard'
 import Agenda from './pages/Agenda'
 import Biblioteca from './pages/Biblioteca'
@@ -15,6 +14,7 @@ import Libro from './pages/Libro'
 import Ruta from './pages/Ruta'
 import Tutor from './pages/Tutor'
 import Suscripcion from './pages/Suscripcion'
+import AdminPanel from './pages/AdminPanel'
 
 export function useAuth() {
   return {
@@ -24,31 +24,53 @@ export function useAuth() {
   }
 }
 
+// Menu segun rol: cada uno ve SOLO lo suyo
+const MENU = {
+  admin: [
+    ['/app/admin', '⚙️ Panel admin'],
+    ['/app/agenda', '📅 Agenda'],
+    ['/app/simulaciones', '📝 Simulaciones'],
+    ['/app/tutor', '🤖 Tutor IA'],
+  ],
+  profesor: [
+    ['/app/cursos', '🧑‍🏫 Mis Cursos'],
+    ['/app/agenda', '📅 Agenda'],
+    ['/app/dudas', '💬 Dudas'],
+    ['/app/biblioteca', '🎬 Biblioteca'],
+    ['/app/simulaciones', '📝 Simulaciones'],
+    ['/app/tutor', '🤖 Tutor IA'],
+  ],
+  apoderado: [
+    ['/app', '📊 Panel'],
+    ['/app/agenda', '📅 Agenda'],
+    ['/app/biblioteca', '🎬 Biblioteca'],
+    ['/app/simulaciones', '📝 Simulaciones'],
+    ['/app/ruta', '🎯 Mi Ruta'],
+    ['/app/tutor', '🤖 Tutor IA'],
+    ['/app/suscripcion', '💳 Suscripción'],
+    ['/app/dudas', '💬 Dudas'],
+  ],
+}
+const HOME = { admin: '/app/admin', profesor: '/app/cursos', apoderado: '/app' }
+
 function AppShell({ children }) {
   const { role, logout } = useAuth()
+  const items = MENU[role] || MENU.apoderado
   return (
     <div className="app">
       <aside className="sidebar">
-        <div className="brand" style={{display: 'flex', alignItems: 'center', gap: '.6rem'}}>
+        <div className="brand" style={{ display: 'flex', alignItems: 'center', gap: '.6rem' }}>
           <Logo size={30} /> Aula<span>Siete</span>
         </div>
-        <div className="role">{role === 'apoderado' ? 'Portal del apoderado' : role === 'profesor' ? 'Portal del docente' : 'Administracion'}</div>
+        <div className="role">
+          {role === 'apoderado' ? 'Portal del apoderado' : role === 'profesor' ? 'Portal del docente' : 'Administración'}
+        </div>
         <nav>
-          <NavLink to="/app" end>📊 Panel</NavLink>
-          <NavLink to="/app/agenda">📅 Agenda</NavLink>
-          <NavLink to="/app/biblioteca">🎬 Biblioteca</NavLink>
-          <NavLink to="/app/simulaciones">📝 Simulaciones</NavLink>
-          <NavLink to="/app/ruta">🎯 Mi Ruta</NavLink>
-          <NavLink to="/app/tutor">🤖 Tutor IA</NavLink>
-          <NavLink to="/app/suscripcion">💳 Suscripción</NavLink>
-          <NavLink to="/app/dudas">💬 Dudas</NavLink>
-          {(role === 'profesor' || role === 'admin') && <NavLink to="/app/cursos">🧑‍🏫 Mis Cursos</NavLink>}
-          {/* LIBRO_PAUSADO: módulo B2B para colegios, se reactiva como segundo producto */}
+          {items.map(([to, label]) => (
+            <NavLink key={to} to={to} end={to === '/app'}>{label}</NavLink>
+          ))}
         </nav>
-        <nav>
-          {role === 'admin' && <NavLink to="/app/admin" style={{ color: '#fbbf24' }}>⚙️ Panel admin</NavLink>}
-        </nav>
-        <div className="foot"><a href="#" onClick={logout}>Cerrar sesion</a></div>
+        <div className="foot"><a href="#" onClick={logout}>Cerrar sesión</a></div>
       </aside>
       <main className="main">{children}</main>
       <Chatbot />
@@ -57,9 +79,15 @@ function AppShell({ children }) {
 }
 
 function Protected({ children }) {
-  const { token } = useAuth()
+  const { token, role } = useAuth()
   if (!token) return <Navigate to="/login" />
   return <AppShell>{children}</AppShell>
+}
+
+// Redirige la raiz /app segun el rol
+function RoleHome() {
+  const { role } = useAuth()
+  return <Navigate to={HOME[role] || '/app'} replace />
 }
 
 export default function App() {
@@ -68,17 +96,16 @@ export default function App() {
       <Route path="/" element={<Landing />} />
       <Route path="/login" element={<Login />} />
       <Route path="/registro" element={<Register />} />
-      <Route path="/app" element={<Protected><Dashboard /></Protected>} />
+      <Route path="/app" element={<Protected><RoleHome /></Protected>} />
+      <Route path="/app/admin" element={<Protected><AdminPanel /></Protected>} />
       <Route path="/app/agenda" element={<Protected><Agenda /></Protected>} />
       <Route path="/app/biblioteca" element={<Protected><Biblioteca /></Protected>} />
       <Route path="/app/simulaciones" element={<Protected><Simulaciones /></Protected>} />
+      <Route path="/app/dudas" element={<Protected><Dudas /></Protected>} />
+      <Route path="/app/cursos" element={<Protected><MisCursos /></Protected>} />
       <Route path="/app/ruta" element={<Protected><Ruta /></Protected>} />
       <Route path="/app/tutor" element={<Protected><Tutor /></Protected>} />
       <Route path="/app/suscripcion" element={<Protected><Suscripcion /></Protected>} />
-      <Route path="/app/admin" element={<Protected><AdminPanel /></Protected>} />
-      <Route path="/app/dudas" element={<Protected><Dudas /></Protected>} />
-      <Route path="/app/cursos" element={<Protected><MisCursos /></Protected>} />
-      <Route path="/app/libro" element={<Protected><Libro /></Protected>} />
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   )
