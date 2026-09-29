@@ -6,11 +6,21 @@ export default function Dashboard() {
   const [lives, setLives] = useState([])
   const [report, setReport] = useState(null)
   const [err, setErr] = useState('')
+  const [retry, setRetry] = useState(0)
 
-  useEffect(() => {
+  function loadAll() {
+    setErr('')
     api('/users/students').then(setStudents).catch(e => setErr('Alumnos: ' + e.message))
     api('/live-classes').then(setLives).catch(e => setErr('Clases: ' + e.message))
-  }, [])
+  }
+  useEffect(() => { loadAll() }, [])
+
+  // El servidor gratuito se duerme: si falla, reintenta solo a los 20 segundos
+  useEffect(() => {
+    if (!err) return
+    const t = setTimeout(() => { setRetry(r => r + 1); loadAll() }, 20000)
+    return () => clearTimeout(t)
+  }, [err])
 
   async function loadReport(id) {
     try { setReport(await api(`/reports/student/${id}`)) }
@@ -20,8 +30,10 @@ export default function Dashboard() {
   return (
     <div>
       <h2 className="page-title">Panel</h2>
-      {err && <div className="error">Error de conexion con el servidor: {err}
-        <br /><small>Si el servicio estaba inactivo, espera 1 minuto y recarga.</small></div>}
+      {err && <div className="error">El servidor se está despertando (toma ~1 minuto en el plan gratuito).
+        <br /><small>Reintentando automáticamente... o presiona:</small>{' '}
+        <button className="btn btn-sm" style={{ background: '#fff', color: '#b91c1c', border: '1px solid #fecaca', marginTop: '.4rem' }}
+                onClick={loadAll}>Reintentar ahora</button></div>}
 
       <section className="card">
         <h3>Mis alumnos</h3>
