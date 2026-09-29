@@ -13,8 +13,21 @@ def _user(db: Session, email: str, name: str, role: str):
         db.add(u); db.commit(); db.refresh(u)
     return u
 
+MIGRACION_EMAIL_ADMIN = ("admin@aulasite.cl", "admin@aulasiete.cl")
+
+def _migrar_email_admin(db: Session):
+    """Alias del admin: la cuenta vieja (aulasite.cl) pasa a ser aulasiete.cl."""
+    viejo, nuevo = MIGRACION_EMAIL_ADMIN
+    if db.query(models.User).filter_by(email=nuevo).first():
+        return
+    u = db.query(models.User).filter_by(email=viejo).first()
+    if u:
+        u.email = nuevo
+        db.commit()
+
 def run_seed(db: Session) -> dict:
-    admin = _user(db, "admin@aulasite.cl", "Admin Aula Site", "admin")
+    _migrar_email_admin(db)
+    admin = _user(db, "admin@aulasiete.cl", "Admin Aula Siete", "admin")
     prof = _user(db, "profesor@demo.cl", "Prof. Carolina Rojas", "profesor")
     guard = _user(db, "apoderado@demo.cl", "Maria Perez", "apoderado")
 
