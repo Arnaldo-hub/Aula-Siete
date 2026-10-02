@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 from .config import settings
 from .database import get_db, SessionLocal, Base, engine, migrate
@@ -27,7 +28,9 @@ for r in (auth.router, users.router, courses.router,
 
 @app.get("/health")
 def health():
-    return {"status": "ok"}
+    with engine.connect() as conn:
+        conn.execute(text("SELECT 1"))
+    return {"status": "ok", "db": "ok"}
 
 @app.get("/api/stats")
 def stats():

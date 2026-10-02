@@ -8,7 +8,7 @@ from .config import settings
 from .database import get_db
 from . import models
 
-pwd = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd = CryptContext(schemes=["bcrypt"], deprecated="auto", bcrypt__rounds=10)
 oauth2 = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
 def hash_password(p: str) -> str:
