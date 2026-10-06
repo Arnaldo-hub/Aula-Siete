@@ -26,6 +26,7 @@ export default function AdminPanel() {
   const [msg, setMsg] = useState('')
   const [err, setErr] = useState('')
   const [seed, setSeed] = useState({ level: 'BASICA_8', teacher_id: '' })
+  const [single, setSingle] = useState({ name: '', level: 'BASICA_8', teacher_id: '' })
   const [nu, setNu] = useState({ email: '', password: '', full_name: '', role: 'profesor' })
 
   function load() {
@@ -51,10 +52,21 @@ export default function AdminPanel() {
     try {
       const r = await api('/levels/seed', { method: 'POST',
         body: { level: seed.level, teacher_id: seed.teacher_id ? Number(seed.teacher_id) : null } })
-      setMsg(`${r.cursos_total} cursos listos en ${r.level} (${r.cursos_nuevos} nuevos) — ` +
-        `${r.alumnos_inscritos} inscripciones automaticas.` +
-        (r.docente ? ` Docente: ${r.docente}.` : ' Ojo: sin docente asignado, el profesor no vera estos cursos.'))
+      setMsg(`${r.cursos_total} cursos en ${r.nivel} (${r.cursos_nuevos} nuevos) — ` +
+        `${r.alumnos_inscritos} inscripciones automáticas.` +
+        (r.docente ? ` Docente: ${r.docente}.` : ' Ojo: sin docente asignado, el profesor no verá estos cursos.'))
       load()
+    } catch (e2) { setErr(e2.message) }
+  }
+
+  async function createSingle(e) {
+    e.preventDefault(); setMsg(''); setErr('')
+    try {
+      const r = await api('/levels/subject', { method: 'POST',
+        body: { name: single.name, level: single.level,
+                teacher_id: single.teacher_id ? Number(single.teacher_id) : null } })
+      setMsg(`Asignatura "${r.curso}" lista${r.nuevo ? '' : ' (ya existía)'} — ${r.alumnos_inscritos} inscripciones automáticas.`)
+      setSingle({ name: '', level: single.level, teacher_id: single.teacher_id }); load()
     } catch (e2) { setErr(e2.message) }
   }
 
@@ -90,22 +102,38 @@ export default function AdminPanel() {
       )}
 
       <section className="card">
-        <h3>🏫 Cursos por nivel (1 click — asignaturas oficiales Mineduc)</h3>
+        <h3>🏫 Cursos por nivel — pack completo oficial Mineduc (1 click)</h3>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr auto', gap: '.6rem' }}>
           <select style={fld} value={seed.level} onChange={e => setSeed({ ...seed, level: e.target.value })}>
             {LEVELS.map(([k, v]) => <option key={k} value={k}>{v}</option>)}
           </select>
           <select style={fld} value={seed.teacher_id} onChange={e => setSeed({ ...seed, teacher_id: e.target.value })}>
-            <option value="">Sin docente asignado aun...</option>
+            <option value="">Sin docente asignado aún...</option>
             {teachers.map(t => <option key={t.id} value={t.id}>{t.full_name}</option>)}
           </select>
           <button className="btn btn-primary" onClick={seedLevel}>Crear cursos</button>
         </div>
         <p className="muted" style={{ fontSize: '.82rem', margin: 0 }}>
-          Crea las asignaturas y cursos oficiales del nivel (4 en 1°-6° básico; 5 desde 7° con Inglés;
-          5 en media) e inscribe automaticamente a los alumnos ya registrados de ese nivel.
-          Puedes repetirlo: no duplica.
+          Crea las <strong>4 asignaturas de 1°-6° básico o 5 desde 7°/media</strong> (con Inglés) e inscribe
+          automáticamente a los alumnos del nivel. Se usa una vez por nivel; se puede repetir sin duplicar
+          (también arregla títulos antiguos).
         </p>
+      </section>
+
+      <section className="card" style={{ background: 'var(--bg-soft)' }}>
+        <h3>➕ Crear UNA asignatura suelta</h3>
+        <form onSubmit={createSingle} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1.2fr auto', gap: '.6rem' }}>
+          <input style={fld} placeholder="Nombre (ej: Ciencias Naturales)" value={single.name}
+            onChange={e => setSingle({ ...single, name: e.target.value })} required />
+          <select style={fld} value={single.level} onChange={e => setSingle({ ...single, level: e.target.value })}>
+            {LEVELS.map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+          </select>
+          <select style={fld} value={single.teacher_id} onChange={e => setSingle({ ...single, teacher_id: e.target.value })}>
+            <option value="">Sin docente...</option>
+            {teachers.map(t => <option key={t.id} value={t.id}>{t.full_name}</option>)}
+          </select>
+          <button className="btn btn-primary" type="submit">Crear</button>
+        </form>
       </section>
 
       {board.length > 0 && (
