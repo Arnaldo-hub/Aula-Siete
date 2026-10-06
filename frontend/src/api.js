@@ -13,7 +13,15 @@ export async function api(path, { method = 'GET', body } = {}) {
     },
     body: body ? JSON.stringify(body) : undefined
   })
-  if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || res.statusText)
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}))
+    const d = data.detail
+    const msg = typeof d === 'string' ? d
+      : Array.isArray(d) ? (d[0]?.msg || JSON.stringify(d))
+      : d ? (d.msg || JSON.stringify(d))
+      : (data.message || res.statusText || ('Error ' + res.status))
+    throw new Error(msg)
+  }
   return res.json()
 }
 export const login = (email, password) =>
