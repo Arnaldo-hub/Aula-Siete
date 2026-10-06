@@ -47,6 +47,28 @@ export default function AdminPanel() {
     } catch (e2) { setErr(e2.message) }
   }
 
+  async function renameUser(u) {
+    const name = window.prompt(`Nuevo nombre para ${u.full_name}:`, u.full_name)
+    if (!name || name === u.full_name) return
+    setMsg(''); setErr('')
+    try {
+      await api('/admin/users/' + u.id, { method: 'PUT', body: { full_name: name } })
+      setMsg(`Usuario actualizado: ${name}`); load()
+    } catch (e2) { setErr(e2.message) }
+  }
+
+  async function removeUser(u) {
+    const extra = u.role === 'apoderado'
+      ? ' Se eliminarán también SUS ALUMNOS y todos sus datos (simulaciones, progreso, suscripciones).'
+      : u.role === 'profesor' ? ' Sus cursos quedarán sin docente asignado.' : ''
+    if (!window.confirm(`¿Eliminar a ${u.full_name} (${u.email})?${extra}`)) return
+    setMsg(''); setErr('')
+    try {
+      await api('/admin/users/' + u.id, { method: 'DELETE' })
+      setMsg(`Usuario eliminado: ${u.full_name}`); load()
+    } catch (e2) { setErr(e2.message) }
+  }
+
   async function seedLevel() {
     setMsg(''); setErr('')
     try {
@@ -115,8 +137,7 @@ export default function AdminPanel() {
         </div>
         <p className="muted" style={{ fontSize: '.82rem', margin: 0 }}>
           Crea las <strong>4 asignaturas de 1°-6° básico o 5 desde 7°/media</strong> (con Inglés) e inscribe
-          automáticamente a los alumnos del nivel. Se usa una vez por nivel; se puede repetir sin duplicar
-          (también arregla títulos antiguos).
+          automáticamente a los alumnos del nivel. Puedes repetirlo: no duplica y arregla títulos antiguos.
         </p>
       </section>
 
@@ -180,13 +201,20 @@ export default function AdminPanel() {
           </select>
         </div>
         <table>
-          <thead><tr><th>#</th><th>Nombre</th><th>Correo</th><th>Rol</th><th>Registro</th></tr></thead>
+          <thead><tr><th>#</th><th>Nombre</th><th>Correo</th><th>Rol</th><th>Registro</th><th>Acciones</th></tr></thead>
           <tbody>
             {shown.map(u => (
               <tr key={u.id}>
                 <td>{u.id}</td><td>{u.full_name}</td><td>{u.email}</td>
                 <td><span className="chip" style={{ fontSize: '.75rem' }}>{u.role}</span></td>
                 <td>{u.created}</td>
+                <td style={{ whiteSpace: 'nowrap' }}>
+                  <button className="btn btn-sm" title="Editar nombre" onClick={() => renameUser(u)}>✏️</button>{' '}
+                  {u.role !== 'admin' && (
+                    <button className="btn btn-sm" title="Eliminar" style={{ color: '#c0392b' }}
+                      onClick={() => removeUser(u)}>🗑️</button>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>
