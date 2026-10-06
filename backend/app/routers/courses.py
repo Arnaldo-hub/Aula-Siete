@@ -86,6 +86,27 @@ def create_course(data: CourseIn,
     db.add(c); db.commit(); db.refresh(c)
     return {"id": c.id}
 
+# ---- Eliminación (limpia cursos de prueba; profesor solo los suyos) ----
+@router.delete("/courses/{course_id}")
+def delete_course(course_id: int,
+                  user: models.User = Depends(require_role("profesor", "admin")),
+                  db: Session = Depends(get_db)):
+    c = db.get(models.Course, course_id)
+    if not c:
+        raise HTTPException(404, "Curso no encontrado")
+    if user.role == "profesor" and c.teacher_id != user.id:
+        raise HTTPException(403, "No es tu curso")
+    db.query(models.Enrollment).filter_by(course_id=course_id).delete()
+    plan_ids = [p.id for p in db.query(models.AcademicPlan).filter_by(course_id=course_id).all()]
+    if plan_ids:
+        db.query(models.Lesson).filter(models.Lesson.plan_id.in_(plan_ids)).delete(synchronize_session=False)
+        db.query(models.AcademicPlan).filter_by(course_id=course_id).delete()
+    db.query(models.Material).filter_by(course_id=course_id).delete()
+    db.query(models.Recording).filter_by(course_id=course_id).delete()
+    db.query(models.LiveClass).filter_by(course_id=course_id).delete()
+    db.delete(c); db.commit()
+    return {"ok": True}
+
 @router.post("/enroll")
 def enroll(student_id: int, course_id: int,
            user: models.User = Depends(require_role("apoderado", "admin")),
