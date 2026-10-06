@@ -3,19 +3,37 @@ import { api } from '../api'
 
 const fld = { width: '100%', padding: '.6rem .8rem', borderRadius: '10px', border: '1.5px solid var(--border)', marginBottom: '.6rem', fontFamily: 'inherit' }
 
+const LEVELS = [
+  ['BASICA_1', '1° Básico'], ['BASICA_2', '2° Básico'], ['BASICA_3', '3° Básico'],
+  ['BASICA_4', '4° Básico'], ['BASICA_5', '5° Básico'], ['BASICA_6', '6° Básico'],
+  ['BASICA_7', '7° Básico'], ['BASICA_8', '8° Básico'],
+  ['MEDIA_1', '1° Medio'], ['MEDIA_2', '2° Medio'], ['MEDIA_3', '3° Medio'], ['MEDIA_4', '4° Medio'],
+]
+
+const subStatus = {
+  pending: '⏳ Pendiente', authorized: '✅ Activa',
+  paused: '⏸ Pausada', cancelled: '❌ Cancelada',
+}
+
 export default function AdminPanel() {
   const [stats, setStats] = useState(null)
   const [users, setUsers] = useState([])
   const [subs, setSubs] = useState([])
+  const [teachers, setTeachers] = useState([])
+  const [board, setBoard] = useState([])
+  const [subFilter, setSubFilter] = useState('')
   const [filter, setFilter] = useState('')
   const [msg, setMsg] = useState('')
   const [err, setErr] = useState('')
+  const [seed, setSeed] = useState({ level: 'BASICA_8', teacher_id: '' })
   const [nu, setNu] = useState({ email: '', password: '', full_name: '', role: 'profesor' })
 
   function load() {
     api('/admin/stats').then(setStats).catch(e => setErr(e.message))
     api('/admin/users').then(setUsers).catch(() => {})
     api('/admin/subscriptions').then(setSubs).catch(() => {})
+    api('/admin/users?role=profesor').then(setTeachers).catch(() => {})
+    api('/levels/board').then(setBoard).catch(() => {})
   }
   useEffect(() => { load() }, [])
 
@@ -28,14 +46,26 @@ export default function AdminPanel() {
     } catch (e2) { setErr(e2.message) }
   }
 
+  async function seedLevel() {
+    setMsg(''); setErr('')
+    try {
+      const r = await api('/levels/seed', { method: 'POST',
+        body: { level: seed.level, teacher_id: seed.teacher_id ? Number(seed.teacher_id) : null } })
+      setMsg(`${r.cursos_total} cursos listos en ${r.level} (${r.cursos_nuevos} nuevos) — ` +
+        `${r.alumnos_inscritos} inscripciones automaticas.` +
+        (r.docente ? ` Docente: ${r.docente}.` : ' Ojo: sin docente asignado, el profesor no vera estos cursos.'))
+      load()
+    } catch (e2) { setErr(e2.message) }
+  }
+
   const shown = filter ? users.filter(u => u.role === filter) : users
+  const shownSubs = subFilter ? subs.filter(s => s.status === subFilter) : subs
 
   const CARDS = stats ? [
     ['👨‍👩‍👧 Apoderados', stats.users_apoderados],
     ['🧑‍🏫 Profesores', stats.users_profesores],
     ['🎒 Alumnos', stats.students],
     ['📚 Cursos', stats.courses],
-    ['📎 Materiales', stats.materials],
     ['📝 Simulaciones rendidas', stats.attempts],
     ['⭐ Promedio general', stats.attempts_avg ? stats.attempts_avg + '%' : '—'],
     ['💳 Suscripciones activas', stats.subscriptions_active],
@@ -57,6 +87,45 @@ export default function AdminPanel() {
             </div>
           ))}
         </div>
+      )}
+
+      <section className="card">
+        <h3>🏫 Cursos por nivel (1 click — asignaturas oficiales Mineduc)</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr auto', gap: '.6rem' }}>
+          <select style={fld} value={seed.level} onChange={e => setSeed({ ...seed, level: e.target.value })}>
+            {LEVELS.map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+          </select>
+          <select style={fld} value={seed.teacher_id} onChange={e => setSeed({ ...seed, teacher_id: e.target.value })}>
+            <option value="">Sin docente asignado aun...</option>
+            {teachers.map(t => <option key={t.id} value={t.id}>{t.full_name}</option>)}
+          </select>
+          <button className="btn btn-primary" onClick={seedLevel}>Crear cursos</button>
+        </div>
+        <p className="muted" style={{ fontSize: '.82rem', margin: 0 }}>
+          Crea las asignaturas y cursos oficiales del nivel (4 en 1°-6° básico; 5 desde 7° con Inglés;
+          5 en media) e inscribe automaticamente a los alumnos ya registrados de ese nivel.
+          Puedes repetirlo: no duplica.
+        </p>
+      </section>
+
+      {board.length > 0 && (
+        <section className="card">
+          <h3>🗂️ Relación curso — docente — alumnos</h3>
+          <table>
+            <thead><tr><th>Curso</th><th>Asignatura</th><th>Nivel</th><th>Docente</th><th>Alumnos</th></tr></thead>
+            <tbody>
+              {board.map(c => (
+                <tr key={c.course_id}>
+                  <td>{c.title}</td>
+                  <td>{c.subject}</td>
+                  <td>{c.level_label}</td>
+                  <td>{c.teacher}</td>
+                  <td>{c.students.length === 0 ? '—' : c.students.map(s => s.name).join(', ')}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
       )}
 
       <section className="card">
@@ -98,16 +167,25 @@ export default function AdminPanel() {
 
       {subs.length > 0 && (
         <section className="card">
-          <h3>💳 Suscripciones ({subs.length})</h3>
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '.8rem' }}>
+            <h3 style={{ margin: 0 }}>💳 Suscripciones ({shownSubs.length})</h3>
+            <select value={subFilter} onChange={e => setSubFilter(e.target.value)} style={{ ...fld, width: 'auto', margin: 0 }}>
+              <option value="">Todos los estados</option>
+              <option value="authorized">✅ Activas</option>
+              <option value="pending">⏳ Pendientes</option>
+              <option value="paused">⏸ Pausadas</option>
+              <option value="cancelled">❌ Canceladas</option>
+            </select>
+          </div>
           <table>
             <thead><tr><th>Apoderado</th><th>Plan</th><th>Monto</th><th>Estado</th><th>Fecha</th></tr></thead>
             <tbody>
-              {subs.map(s => (
+              {shownSubs.map(s => (
                 <tr key={s.id}>
                   <td>{s.guardian}</td>
                   <td>{s.plan === 'grupal' ? 'Grupo En Vivo' : 'Intensivo 1 a 1'}</td>
                   <td>${s.amount.toLocaleString('es-CL')}</td>
-                  <td>{s.status === 'authorized' ? '✅ Activa' : s.status}</td>
+                  <td>{subStatus[s.status] || s.status}</td>
                   <td>{s.date}</td>
                 </tr>
               ))}
