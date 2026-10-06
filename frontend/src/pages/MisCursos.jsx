@@ -9,6 +9,8 @@ const LEVELS = [
   ['MEDIA_1', '1° Medio'], ['MEDIA_2', '2° Medio'], ['MEDIA_3', '3° Medio'], ['MEDIA_4', '4° Medio'],
 ]
 const nivelLabel = (lv) => (LEVELS.find(([k]) => k === lv) || [null, lv || '—'])[1]
+const levelOrder = (lv) => { const i = LEVELS.findIndex(([k]) => k === lv); return i === -1 ? 99 : i }
+const fld = { width: '100%', padding: '.65rem .8rem', borderRadius: '10px', border: '1.5px solid var(--border)', marginBottom: '.7rem', fontFamily: 'inherit' }
 
 export default function MisCursos() {
   const [board, setBoard] = useState([])
@@ -27,12 +29,26 @@ export default function MisCursos() {
   }
   useEffect(() => { load() }, [])
 
+  const teacherName = board.length ? board[0].teacher : ''
+  const groups = LEVELS
+    .map(([k, label]) => [k, label, board.filter(c => c.level === k).sort((a, b) => a.subject.localeCompare(b.subject))])
+    .filter(([, , cs]) => cs.length > 0)
+
   async function createCourse(e) {
     e.preventDefault(); setMsg(''); setErr('')
     try {
       await api('/courses', { method: 'POST', body: { ...newCourse, subject_id: Number(newCourse.subject_id) } })
-      setMsg('Curso creado. Ya aparece en tu lista.')
+      setMsg('Curso creado. Ya aparece en su nivel.')
       setNewCourse({ title: '', subject_id: '', level: 'BASICA_8', description: '' }); load()
+    } catch (e2) { setErr(e2.message) }
+  }
+
+  async function removeCourse(c) {
+    if (!window.confirm(`¿Eliminar el curso "${c.title}"? Se quitarán sus inscripciones y materiales.`)) return
+    setMsg(''); setErr('')
+    try {
+      await api('/courses/' + c.course_id, { method: 'DELETE' })
+      setMsg(`Curso "${c.title}" eliminado`); load()
     } catch (e2) { setErr(e2.message) }
   }
 
@@ -64,83 +80,90 @@ export default function MisCursos() {
     } catch (e2) { setErr(e2.message) }
   }
 
-  const fld = { width: '100%', padding: '.65rem .8rem', borderRadius: '10px', border: '1.5px solid var(--border)', marginBottom: '.7rem', fontFamily: 'inherit' }
-
   return (
     <div>
-      <h2 className="page-title">Mis cursos</h2>
+      <h2 className="page-title">Mis cursos{teacherName ? ` — ${teacherName}` : ''}</h2>
+      <p className="muted" style={{ marginTop: '-0.5rem' }}>
+        {board.length} curso(s) asignado(s), ordenados por nivel.
+      </p>
       {msg && <div className="card ok">{msg}</div>}
       {err && <div className="error">{err}</div>}
 
       {board.length === 0 && (
         <div className="card">
           <p><strong>Aún no tienes cursos asignados.</strong></p>
-          <p className="muted">El administrador debe crear los cursos de tu nivel desde
-            su panel ("Cursos por nivel") y asignártelos. Si necesitas un curso extra,
-            créalo abajo (requiere que exista la asignatura).</p>
+          <p className="muted">El administrador debe crearlos desde su panel ("Cursos por nivel")
+            seleccionándote como docente.</p>
         </div>
       )}
 
-      {board.map(c => (
-        <section className="card" key={c.course_id}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '.6rem' }}>
-            <h3 style={{ margin: 0 }}>{c.title}</h3>
-            <span className="chip" style={{ fontSize: '.8rem' }}>
-              {c.subject} · {c.level_label} · 👨‍🎓 {c.students.length} alumno(s)
-            </span>
-          </div>
-
-          <div style={{ display: 'flex', gap: '.6rem', marginTop: '.9rem', flexWrap: 'wrap' }}>
-            <button className="btn btn-outline btn-sm" onClick={() => setExpanded(expanded === c.course_id ? null : c.course_id)}>
-              {expanded === c.course_id ? 'Ocultar alumnos' : '👨‍🎓 Ver alumnos'}
-            </button>
-          </div>
-
-          {expanded === c.course_id && (
-            <div style={{ marginTop: '1rem' }}>
-              {c.students.length === 0 && <p className="muted">Sin alumnos inscritos aún.</p>}
-              {c.students.map(s => (
-                <div key={s.id} className="chip" style={{ display: 'inline-block', margin: '0 .5rem .5rem 0' }}>
-                  {s.name} · {s.level}
+      {groups.map(([lv, label, cs]) => (
+        <div key={lv}>
+          <h3 style={{ margin: '1.6rem 0 .8rem', borderBottom: '2px solid var(--border)', paddingBottom: '.3rem' }}>
+            📚 {label}
+          </h3>
+          {cs.map(c => (
+            <section className="card" key={c.course_id}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '.6rem' }}>
+                <h3 style={{ margin: 0 }}>{c.subject}</h3>
+                <div style={{ display: 'flex', gap: '.5rem', alignItems: 'center' }}>
+                  <span className="chip" style={{ fontSize: '.8rem' }}>👨‍🎓 {c.students.length} alumno(s)</span>
+                  <button className="btn btn-outline btn-sm" onClick={() => setExpanded(expanded === c.course_id ? null : c.course_id)}>
+                    {expanded === c.course_id ? 'Ocultar' : 'Gestionar'}
+                  </button>
+                  <button className="btn btn-sm" style={{ color: '#c0392b' }} onClick={() => removeCourse(c)}>🗑️</button>
                 </div>
-              ))}
-
-              <h3 style={{ marginTop: '1.2rem' }}>📚 Agregar material al curso</h3>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr 1fr auto', gap: '.6rem' }}>
-                <input style={fld} placeholder="Titulo (ej: Guia fracciones)" value={(mat[c.course_id] || {}).title || ''}
-                  onChange={e => setMat(m => ({ ...m, [c.course_id]: { ...(m[c.course_id] || {}), title: e.target.value } }))} />
-                <input style={fld} placeholder="URL (Google Drive, link PDF...)" value={(mat[c.course_id] || {}).file_url || ''}
-                  onChange={e => setMat(m => ({ ...m, [c.course_id]: { ...(m[c.course_id] || {}), file_url: e.target.value } }))} />
-                <select style={fld} value={(mat[c.course_id] || {}).file_type || 'link'}
-                  onChange={e => setMat(m => ({ ...m, [c.course_id]: { ...(m[c.course_id] || {}), file_type: e.target.value } }))}>
-                  <option value="link">Enlace</option><option value="pdf">PDF</option>
-                  <option value="docx">Documento</option><option value="video">Video</option>
-                </select>
-                <button className="btn btn-primary btn-sm" onClick={() => addMaterial(c.course_id)}>Subir</button>
               </div>
+              <p className="muted" style={{ margin: '.4rem 0 0', fontSize: '.85rem' }}>{c.title}</p>
 
-              <h3 style={{ marginTop: '1.2rem' }}>🎥 Agendar clase en vivo</h3>
-              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr auto', gap: '.6rem' }}>
-                <input style={fld} placeholder="Titulo de la clase" value={(live[c.course_id] || {}).title || ''}
-                  onChange={e => setLive(l => ({ ...l, [c.course_id]: { ...(l[c.course_id] || {}), title: e.target.value } }))} />
-                <input style={fld} type="datetime-local" value={(live[c.course_id] || {}).starts_at || ''}
-                  onChange={e => setLive(l => ({ ...l, [c.course_id]: { ...(l[c.course_id] || {}), starts_at: e.target.value } }))} />
-                <input style={fld} type="datetime-local" value={(live[c.course_id] || {}).ends_at || ''}
-                  onChange={e => setLive(l => ({ ...l, [c.course_id]: { ...(l[c.course_id] || {}), ends_at: e.target.value } }))} />
-                <button className="btn btn-primary btn-sm" onClick={() => scheduleLive(c.course_id)}>Agendar</button>
-              </div>
+              {expanded === c.course_id && (
+                <div style={{ marginTop: '1rem' }}>
+                  <h4 style={{ margin: '0 0 .5rem' }}>👨‍🎓 Alumnos inscritos</h4>
+                  {c.students.length === 0 && <p className="muted">Sin alumnos inscritos aún.</p>}
+                  {c.students.map(s => (
+                    <div key={s.id} className="chip" style={{ display: 'inline-block', margin: '0 .5rem .5rem 0' }}>
+                      {s.name} · {s.level}
+                    </div>
+                  ))}
 
-              <h3 style={{ marginTop: '1.2rem' }}>📼 Publicar grabacion en biblioteca</h3>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr auto', gap: '.6rem' }}>
-                <input style={fld} placeholder="Titulo de la clase grabada" value={(rec[c.course_id] || {}).title || ''}
-                  onChange={e => setRec(r => ({ ...r, [c.course_id]: { ...(r[c.course_id] || {}), title: e.target.value } }))} />
-                <input style={fld} placeholder="URL del video (YouTube/Drive...)" value={(rec[c.course_id] || {}).video_url || ''}
-                  onChange={e => setRec(r => ({ ...r, [c.course_id]: { ...(r[c.course_id] || {}), video_url: e.target.value } }))} />
-                <button className="btn btn-primary btn-sm" onClick={() => addRecording(c.course_id)}>Publicar</button>
-              </div>
-            </div>
-          )}
-        </section>
+                  <h4 style={{ marginTop: '1.2rem' }}>📚 Agregar material</h4>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr 1fr auto', gap: '.6rem' }}>
+                    <input style={fld} placeholder="Titulo (ej: Guia fracciones)" value={(mat[c.course_id] || {}).title || ''}
+                      onChange={e => setMat(m => ({ ...m, [c.course_id]: { ...(m[c.course_id] || {}), title: e.target.value } }))} />
+                    <input style={fld} placeholder="URL (Google Drive, link PDF...)" value={(mat[c.course_id] || {}).file_url || ''}
+                      onChange={e => setMat(m => ({ ...m, [c.course_id]: { ...(m[c.course_id] || {}), file_url: e.target.value } }))} />
+                    <select style={fld} value={(mat[c.course_id] || {}).file_type || 'link'}
+                      onChange={e => setMat(m => ({ ...m, [c.course_id]: { ...(m[c.course_id] || {}), file_type: e.target.value } }))}>
+                      <option value="link">Enlace</option><option value="pdf">PDF</option>
+                      <option value="docx">Documento</option><option value="video">Video</option>
+                    </select>
+                    <button className="btn btn-primary btn-sm" onClick={() => addMaterial(c.course_id)}>Subir</button>
+                  </div>
+
+                  <h4 style={{ marginTop: '1.2rem' }}>🎥 Agendar clase en vivo</h4>
+                  <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr auto', gap: '.6rem' }}>
+                    <input style={fld} placeholder="Titulo de la clase" value={(live[c.course_id] || {}).title || ''}
+                      onChange={e => setLive(l => ({ ...l, [c.course_id]: { ...(l[c.course_id] || {}), title: e.target.value } }))} />
+                    <input style={fld} type="datetime-local" value={(live[c.course_id] || {}).starts_at || ''}
+                      onChange={e => setLive(l => ({ ...l, [c.course_id]: { ...(l[c.course_id] || {}), starts_at: e.target.value } }))} />
+                    <input style={fld} type="datetime-local" value={(live[c.course_id] || {}).ends_at || ''}
+                      onChange={e => setLive(l => ({ ...l, [c.course_id]: { ...(l[c.course_id] || {}), ends_at: e.target.value } }))} />
+                    <button className="btn btn-primary btn-sm" onClick={() => scheduleLive(c.course_id)}>Agendar</button>
+                  </div>
+
+                  <h4 style={{ marginTop: '1.2rem' }}>📼 Publicar grabacion en biblioteca</h4>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr auto', gap: '.6rem' }}>
+                    <input style={fld} placeholder="Titulo de la clase grabada" value={(rec[c.course_id] || {}).title || ''}
+                      onChange={e => setRec(r => ({ ...r, [c.course_id]: { ...(r[c.course_id] || {}), title: e.target.value } }))} />
+                    <input style={fld} placeholder="URL del video (YouTube/Drive...)" value={(rec[c.course_id] || {}).video_url || ''}
+                      onChange={e => setRec(r => ({ ...r, [c.course_id]: { ...(r[c.course_id] || {}), video_url: e.target.value } }))} />
+                    <button className="btn btn-primary btn-sm" onClick={() => addRecording(c.course_id)}>Publicar</button>
+                  </div>
+                </div>
+              )}
+            </section>
+          ))}
+        </div>
       ))}
 
       <section className="card" style={{ marginTop: '1.5rem', background: 'var(--bg-soft)' }}>
