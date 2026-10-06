@@ -31,13 +31,16 @@ def student_report(student_id: int,
     avg = (db.query(func.avg(models.ExamAttempt.score))
            .filter_by(student_id=student_id).scalar())
 
+    pts = (db.query(func.coalesce(func.sum(models.ExamAttempt.score), 0))
+           .filter_by(student_id=student_id).scalar())
+
     return {
         "student_id": student_id,
         "courses": [{"id": c.id, "title": c.title} for c in enrollments],
         "lessons_completed": done,
         "lessons_total": len(prog),
         "exam_average": float(avg) if avg else None,
-            "points": int(pts or 0),
+        "points": int(pts or 0),
         "recent_attempts": [
             {"exam": e.title, "score": float(a.score), "date": str(a.finished_at)}
             for a, e in attempts],
