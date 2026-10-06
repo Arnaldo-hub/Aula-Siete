@@ -1,34 +1,53 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { api } from '../api'
 
+const LEVELS = [
+  ['PREKINDER', 'Prekínder'], ['KINDER', 'Kínder'],
+  ['BASICA_1', '1° Básico'], ['BASICA_2', '2° Básico'], ['BASICA_3', '3° Básico'],
+  ['BASICA_4', '4° Básico'], ['BASICA_5', '5° Básico'], ['BASICA_6', '6° Básico'],
+  ['BASICA_7', '7° Básico'], ['BASICA_8', '8° Básico'],
+  ['MEDIA_1', '1° Medio'], ['MEDIA_2', '2° Medio'], ['MEDIA_3', '3° Medio'], ['MEDIA_4', '4° Medio'],
+]
+const nivelLabel = (lv) => (LEVELS.find(([k]) => k === lv) || [null, lv || '—'])[1]
+
+const subStatus = {
+  pending: '⏳ Pendiente de confirmación',
+  authorized: '✅ Activa',
+  paused: '⏸ Pausada (pago fallido)',
+  cancelled: '❌ Cancelada',
+}
+
 export default function Suscripcion() {
-  const [plans, setPlans] = useState([])
   const [students, setStudents] = useState([])
-  const [sid, setSid] = useState('')
-  const [subs, setSubs] = useState([])
-  const [msg, setMsg] = useState('')
+  const [sel, setSel] = useState('')
+  const [estado, setEstado] = useState(null)
   const [err, setErr] = useState('')
+  const [msg, setMsg] = useState('')
+
+  function load() {
+    api('/users/students').then((rows) => {
+      setStudents(rows)
+      if (rows.length && !sel) setSel(String(rows[0].id))
+    }).catch(() => {})
+  }
+  useEffect(() => { load() }, [])
 
   useEffect(() => {
-    api('/payments/plans').then(setPlans).catch(e => setErr(e.message))
-    api('/users/students').then(s => { setStudents(s); if (s[0]) setSid(String(s[0].id)) }).catch(() => {})
-    if (location.search.includes('estado=ok')) setMsg('Suscripción iniciada en Mercado Pago. El estado se confirma en segundos.')
-  }, [])
+    if (!sel) { setEstado(null); return }
+    api('/payments/my-status?student_id=' + sel).then(setEstado).catch(() => setEstado(null))
+  }, [sel])
 
-  useEffect(() => {
-    if (sid) api(`/payments/status?student_id=${sid}`).then(setSubs).catch(() => {})
-  }, [sid])
-
-  async function subscribe(planId) {
+  async function subscribe(plan) {
     setErr(''); setMsg('')
+    if (!sel) { setErr('Primero selecciona el alumno a inscribir.'); return }
     try {
-      const r = await api(`/payments/subscribe?plan=${planId}&student_id=${sid}`, { method: 'POST', body: {} })
-      window.location.href = r.init_point   // va a Mercado Pago a autorizar el pago
+      const r = await api('/payments/subscribe?plan=' + plan + '&student_id=' + sel, { method: 'POST' })
+      if (r.init_point) window.location.href = r.init_point
     } catch (e2) { setErr(e2.message) }
   }
 
-  const statusTxt = { pending: '⏳ Pendiente de confirmación', authorized: '✅ Activa',
-                      paused: '⏸ Pausada', cancelled: '❌ Cancelada' }
+  const selStudent = students.find((s) => String(s.id) === String(sel))
 
   return (
     <div>
@@ -36,42 +55,58 @@ export default function Suscripcion() {
       {msg && <div className="card ok">{msg}</div>}
       {err && <div className="error">{err}</div>}
 
-      <section className="card">
-        <label style={{ fontSize: '.85rem', fontWeight: 600 }}>Alumno a inscribir</label>
-        <select value={sid} onChange={e => setSid(e.target.value)} style={{ width: '100%', padding: '.65rem .8rem', borderRadius: '10px', border: '1.5px solid var(--border)' }}>
-          {students.map(s => <option key={s.id} value={s.id}>Alumno #{s.id} - Nivel {s.level}</option>)}
-        </select>
-      </section>
+      {students.length === 0 ? (
+        <div className="card">
+          <h3>Primero registra a tu alumno</h3>
+          <p>Para contratar un plan necesitas registrar al menos un alumno con su nivel.
+            Hazlo desde el <Link to="/app"><strong>Panel → Registrar alumno</strong></Link> y vuelve aquí.</p>
+        </div>
+      ) : (
+        <div className="card">
+          <h3>Alumno a inscribir</h3>
+          <select value={sel} onChange={(e) => setSel(e.target.value)}
+            style={{ width: '100%', padding: '.6rem .8rem', borderRadius: '10px', border: '1.5px solid var(--border)', fontFamily: 'inherit' }}>
+            {students.map((s) => <option key={s.id} value={s.id}>{s.name} — {nivelLabel(s.level)}</option>)}
+          </select>
+          {estado && (
+            <p style={{ marginTop: '.8rem' }}>
+              Estado del plan: <strong>{subStatus[estado.status] || estado.status}</strong>
+              {estado.status !== 'authorized' && (
+                <span className="muted"> — el botón Suscribirse de abajo reactiva o crea el cobro.</span>
+              )}
+            </p>
+          )}
+        </div>
+      )}
 
-      <div className="grid">
-        {plans.map(p => (
-          <div className="card" key={p.id} style={{ textAlign: 'center' }}>
-            <h3>{p.name.replace(' - Aula Siete', '')}</h3>
-            <p style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--primary)', margin: '.5rem 0' }}>{p.formatted}</p>
-            <p className="muted">Cobro mensual automático con Mercado Pago. Cancela cuando quieras.</p>
-            <button className="btn btn-primary" onClick={() => subscribe(p.id)}>Suscribirse</button>
-          </div>
-        ))}
+      <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
+        <div className="card" style={{ textAlign: 'center' }}>
+          <h3>Plan Grupo En Vivo</h3>
+          <p style={{ fontSize: '1.7rem', fontWeight: 800, color: 'var(--primary)', margin: '.4rem 0' }}>
+            $49.900 <small style={{ fontSize: '.95rem' }}>CLP/mes</small></p>
+          <p className="muted">Cobro mensual automático con Mercado Pago. Cancela cuando quieras.</p>
+          <button className="btn btn-primary" disabled={students.length === 0}
+            onClick={() => subscribe('grupal')}>Suscribirse</button>
+        </div>
+        <div className="card" style={{ textAlign: 'center' }}>
+          <h3>Plan Intensivo 1 a 1</h3>
+          <p style={{ fontSize: '1.7rem', fontWeight: 800, color: 'var(--primary)', margin: '.4rem 0' }}>
+            $119.900 <small style={{ fontSize: '.95rem' }}>CLP/mes</small></p>
+          <p className="muted">Cobro mensual automático con Mercado Pago. Cancela cuando quieras.</p>
+          <button className="btn btn-primary" disabled={students.length === 0}
+            onClick={() => subscribe('intensivo')}>Suscribirse</button>
+        </div>
       </div>
 
-      {subs.length > 0 && (
-        <section className="card">
-          <h3>Mis suscripciones</h3>
-          <table>
-            <thead><tr><th>Plan</th><th>Monto</th><th>Estado</th><th>Fecha</th></tr></thead>
-            <tbody>
-              {subs.map(s => (
-                <tr key={s.id}>
-                  <td>{s.plan === 'grupal' ? 'Grupo En Vivo' : 'Intensivo 1 a 1'}</td>
-                  <td>${s.amount.toLocaleString('es-CL')}</td>
-                  <td>{statusTxt[s.status] || s.status}</td>
-                  <td>{s.date}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </section>
-      )}
+      <div className="card">
+        <h3>¿Cómo funciona el cobro?</h3>
+        <ul style={{ margin: 0, paddingLeft: '1.2rem' }}>
+          <li>Al suscribirte, Mercado Pago te cobra <strong>automáticamente cada mes</strong> con tu medio de pago.</li>
+          <li>Si un cobro falla, MP reintenta; si sigue fallando el plan se pausa y el acceso se corta temporalmente.</li>
+          <li>Para reactivar, vuelve a esta página y aprieta <strong>Suscribirse</strong> (se crea el cobro de nuevo).</li>
+          <li>Para cancelar definitivamente, hazlo desde tu cuenta de Mercado Pago (sección Suscripciones) o escríbenos por WhatsApp.</li>
+        </ul>
+      </div>
     </div>
   )
 }
