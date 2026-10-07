@@ -17,7 +17,7 @@ class Student(Base):
     id = Column(BigInteger, primary_key=True)
     user_id = Column(BigInteger, ForeignKey("users.id", ondelete="CASCADE"))
     guardian_id = Column(BigInteger, ForeignKey("users.id"), nullable=False)
-    run = Column(String, unique=True)
+    run = Column(String)   # sin unique: muchos alumnos pueden no tener RUN
     birth_date = Column(Date)
     level = Column(String, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default="now()")

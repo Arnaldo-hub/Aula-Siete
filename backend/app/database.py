@@ -11,6 +11,7 @@ MIGRATIONS = [
     "ALTER TABLE questions ADD COLUMN IF NOT EXISTS oa TEXT",
     "ALTER TABLE materials ADD COLUMN IF NOT EXISTS oa TEXT",
     "ALTER TABLE exams ADD COLUMN IF NOT EXISTS kind VARCHAR(20) DEFAULT 'simulacro'",
+    "ALTER TABLE students DROP CONSTRAINT IF EXISTS students_run_key",
 ]
 
 def migrate():
