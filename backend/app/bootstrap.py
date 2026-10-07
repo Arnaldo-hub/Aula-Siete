@@ -117,6 +117,170 @@ for _lvl in ['MEDIA_1', 'MEDIA_2', 'MEDIA_3', 'MEDIA_4']:
     MEDIA_BANK.append(('Ingles', _lvl, 'Diagnóstico Inglés ' + _lvl[6] + '° Medio', 'diagnostico', _ingles_media))
 
 
+BASICA_BANK = []
+_MAT = {
+'BASICA_1': [
+    ('5 + 7 =', ['11', '12', '13', '10'], '12', 'OA 6', 1),
+    ('10 - 4 =', ['5', '6', '7', '8'], '6', 'OA 7', 1),
+    ('¿Qué número sigue? 3, 4, 5, ...', ['6', '7', '8', '5'], '6', 'OA 8', 1),
+    ('¿Cuál es el número mayor?', ['8', '3', '9', '6'], '9', 'OA 4', 1),
+    ('10 + 6 =', ['16', '15', '17', '14'], '16', 'OA 6', 1),
+    ('La figura que tiene 3 lados es el:', ['círculo', 'triángulo', 'cuadrado', 'rectángulo'], 'triángulo', 'OA 17', 1),
+    ('¿Cuántas decenas hay en 30?', ['2', '3', '4', '5'], '3', 'OA 5', 2),
+    ('9 + 8 =', ['16', '17', '18', '15'], '17', 'OA 6', 1),
+    ('¿Qué número es mayor que 15?', ['12', '14', '18', '10'], '18', 'OA 4', 1),
+    ('2 decenas y 5 unidades forman el número:', ['25', '52', '20', '7'], '25', 'OA 5', 2),
+    ('Tienes 4 manzanas y comes 1. ¿Cuántas quedan?', ['2', '3', '4', '5'], '3', 'OA 7', 1),
+    ('¿Qué número sigue? 2, 4, 6, ...', ['7', '8', '9', '10'], '8', 'OA 8', 2)],
+'BASICA_2': [
+    ('23 + 14 =', ['37', '36', '38', '47'], '37', 'OA 6', 1),
+    ('50 - 25 =', ['20', '25', '30', '35'], '25', 'OA 7', 1),
+    ('3 × 4 =', ['7', '10', '12', '14'], '12', 'OA 9', 1),
+    ('La mitad de 10 es:', ['4', '5', '6', '20'], '5', 'OA 10', 2),
+    ('¿Qué número sigue? 5, 10, 15, ...', ['16', '18', '20', '25'], '20', 'OA 8', 1),
+    ('7 × 2 =', ['14', '12', '9', '16'], '14', 'OA 9', 1),
+    ('La figura con 4 lados iguales es el:', ['triángulo', 'cuadrado', 'círculo', 'hexágono'], 'cuadrado', 'OA 17', 1),
+    ('100 es igual a ___ decenas.', ['1', '10', '100', '5'], '10', 'OA 5', 2),
+    ('45 + 9 =', ['54', '55', '53', '64'], '54', 'OA 6', 2),
+    ('El doble de 8 es:', ['12', '16', '4', '14'], '16', 'OA 10', 2),
+    ('3 × 10 =', ['13', '30', '3', '33'], '30', 'OA 9', 1),
+    ('60 - 18 =', ['42', '32', '52', '48'], '42', 'OA 7', 2)],
+'BASICA_3': [
+    ('7 × 6 =', ['42', '36', '48', '40'], '42', 'OA 9', 1),
+    ('81 ÷ 9 =', ['8', '9', '7', '10'], '9', 'OA 10', 1),
+    ('300 + 450 =', ['650', '750', '550', '700'], '750', 'OA 6', 1),
+    ('La fracción 1/2 representa:', ['un cuarto', 'la mitad', 'un tercio', 'el doble'], 'la mitad', 'OA 11', 1),
+    ('El perímetro de un cuadrado de lado 4 cm es:', ['8 cm', '12 cm', '16 cm', '20 cm'], '16 cm', 'OA 18', 2),
+    ('9 × 4 =', ['32', '36', '45', '40'], '36', 'OA 9', 1),
+    ('Redondea 47 a la decena más cercana:', ['40', '45', '50', '47'], '50', 'OA 3', 2),
+    ('7 docenas son ___ unidades.', ['7', '72', '84', '14'], '84', 'OA 10', 3),
+    ('240 ÷ 6 =', ['40', '30', '60', '24'], '40', 'OA 10', 2),
+    ('¿Cuál es el número mayor?', ['999', '1000', '909', '990'], '1000', 'OA 4', 1),
+    ('3/4 es mayor que:', ['1/4', '3/4', '1', '2/2'], '1/4', 'OA 11', 2),
+    ('8 cajas con 12 lápices cada una. ¿Cuántos lápices hay?', ['20', '96', '84', '88'], '96', 'OA 12', 2)],
+'BASICA_4': [
+    ('23 × 4 =', ['82', '92', '72', '96'], '92', 'OA 9', 1),
+    ('144 ÷ 12 =', ['10', '11', '12', '14'], '12', 'OA 10', 2),
+    ('2/4 equivale a:', ['1/2', '1/4', '2/2', '3/4'], '1/2', 'OA 11', 1),
+    ('0,5 es igual a:', ['1/2', '1/4', '1/10', '2/3'], '1/2', 'OA 13', 2),
+    ('El área de un rectángulo de 5 × 3 es:', ['8', '15', '16', '12'], '15', 'OA 18', 1),
+    ('3 metros son ___ centímetros.', ['30', '300', '3000', '3'], '300', 'OA 16', 1),
+    ('25 × 5 =', ['100', '115', '125', '150'], '125', 'OA 9', 2),
+    ('La suma de los ángulos internos de un triángulo es:', ['90°', '180°', '270°', '360°'], '180°', 'OA 17', 2),
+    ('El promedio de 4, 6 y 8 es:', ['5', '6', '7', '8'], '6', 'OA 23', 2),
+    ('720 ÷ 8 =', ['80', '90', '70', '85'], '90', 'OA 10', 2),
+    ('1/3 + 1/3 =', ['1/6', '2/3', '2/6', '1'], '2/3', 'OA 11', 2),
+    ('x + 15 = 40. Entonces x =', ['20', '25', '30', '35'], '25', 'OA 14', 3)],
+'BASICA_5': [
+    ('1/2 + 1/4 =', ['2/4', '3/4', '1/2', '1/4'], '3/4', 'OA 11', 2),
+    ('0,75 equivale a:', ['3/4', '1/2', '7/5', '2/3'], '3/4', 'OA 13', 2),
+    ('¿Cuál conjunto contiene todos los divisores de 12?', ['1, 2, 3, 4, 6, 12', '1 y 12', '2, 4 y 6', '1, 3 y 5'], '1, 2, 3, 4, 6, 12', 'OA 3', 2),
+    ('El mínimo común múltiplo de 4 y 6 es:', ['8', '12', '24', '10'], '12', 'OA 4', 2),
+    ('3² × 3³ =', ['3⁵', '3⁶', '9⁵', '6⁵'], '3⁵', 'OA 2', 3),
+    ('20% de 150 =', ['15', '20', '30', '45'], '30', 'OA 12', 2),
+    ('El volumen de un cubo de arista 3 es:', ['6', '9', '27', '18'], '27', 'OA 19', 2),
+    ('7,25 + 3,5 =', ['10,30', '10,75', '11,30', '10,25'], '10,75', 'OA 13', 2),
+    ('4/5 de 100 =', ['20', '40', '80', '60'], '80', 'OA 11', 3),
+    ('¿Cuál de estos números es primo?', ['9', '11', '15', '21'], '11', 'OA 3', 1),
+    ('2/3 ÷ 4/6 =', ['1', '8/12', '1/2', '2'], '1', 'OA 11', 3),
+    ('El perímetro de un rectángulo de 8 × 5 es:', ['13', '26', '40', '25'], '26', 'OA 18', 2)],
+'BASICA_6': [
+    ('La razón entre 12 y 18 simplificada es:', ['2/3', '3/2', '4/6', '6/9'], '2/3', 'OA 5', 2),
+    ('35% de 200 =', ['35', '60', '70', '80'], '70', 'OA 12', 2),
+    ('(-3) + 7 =', ['4', '10', '-4', '-10'], '4', 'OA 1', 1),
+    ('Si x = 4, ¿cuánto vale 3x - 2?', ['10', '12', '14', '8'], '10', 'OA 9', 2),
+    ('El área de un triángulo de base 10 y altura 6 es:', ['16', '30', '60', '32'], '30', 'OA 18', 2),
+    ('2,5 km son ___ metros.', ['25', '250', '2500', '25000'], '2500', 'OA 16', 2),
+    ('El máximo común divisor de 18 y 24 es:', ['3', '6', '9', '12'], '6', 'OA 4', 2),
+    ('3/4 ÷ 2/8 =', ['3', '3/2', '1/3', '12/16'], '3', 'OA 11', 3),
+    ('2³ × 5 - 4 =', ['36', '40', '16', '30'], '36', 'OA 2', 3),
+    ('Si 3/5 = x/15, entonces x =', ['3', '6', '9', '15'], '9', 'OA 6', 3),
+    ('-8 - (-3) =', ['-11', '-5', '5', '11'], '-5', 'OA 1', 3),
+    ('El promedio de 10, 20, 30 y 40 es:', ['20', '25', '30', '40'], '25', 'OA 23', 2)]}
+_LENG = {
+'BASICA_1': [
+    ('Las vocales son:', ['a, e, i, o, u', 'b, c, d, f, g', 'a, b, c, d, e', 'm, n, ñ, o, p'], 'a, e, i, o, u', 'OA 3', 1),
+    ('"Perro" tiene ___ sílabas.', ['1', '2', '3', '4'], '2', 'OA 4', 1),
+    ('¿Cuál palabra empieza igual que "gato"?', ['gallo', 'perro', 'casa', 'luna'], 'gallo', 'OA 3', 1),
+    ('Palabra que rima con "luna":', ['cuna', 'pan', 'sol', 'mesa'], 'cuna', 'OA 7', 1),
+    ('"El ___ come." Elige el sustantivo.', ['niño', 'rápido', 'grande', 'azul'], 'niño', 'OA 5', 1),
+    ('¿Cuántas letras tiene "casa"?', ['3', '4', '5', '6'], '4', 'OA 4', 1),
+    ('"La ___ es roja." Elige la palabra adecuada.', ['manzana', 'correr', 'verde', 'saltar'], 'manzana', 'OA 5', 1),
+    ('Una oración es:', ['un conjunto de palabras con sentido completo', 'una sola letra', 'un número', 'un dibujo'], 'un conjunto de palabras con sentido completo', 'OA 2', 2),
+    ('"Gato" es un:', ['animal', 'fruta', 'color', 'número'], 'animal', 'OA 5', 1),
+    ('¿Cuál de estas palabras es un nombre propio?', ['perro', 'Chile', 'casa', 'lápiz'], 'Chile', 'OA 5', 2),
+    ('¿Cuál palabra es la más larga?', ['sol', 'mesa', 'uvas', 'abecedario'], 'abecedario', 'OA 4', 1),
+    ('En "mesa", la letra que suena /m/ es:', ['s', 'm', 'e', 'a'], 'm', 'OA 3', 2)],
+'BASICA_2': [
+    ('Sinónimo de "feliz":', ['triste', 'contento', 'enojado', 'cansado'], 'contento', 'OA 8', 1),
+    ('Antónimo de "grande":', ['enorme', 'gigante', 'pequeño', 'alto'], 'pequeño', 'OA 8', 1),
+    ('"Elefante" se separa en sílabas:', ['e-le-fan-te', 'el-efa-n-te', 'ele-fan-te', 'e-lef-ante'], 'e-le-fan-te', 'OA 4', 1),
+    ('Palabra escrita correctamente con "qu":', ['queso', 'keso', 'kasa', 'kilo'], 'queso', 'OA 12', 1),
+    ('¿Cuál es una oración completa?', ['El perro grande', 'El perro ladra.', 'Ladrando el', 'Perro el'], 'El perro ladra.', 'OA 2', 2),
+    ('"La niña ___ alta."', ['es', 'son', 'están', 'eran'], 'es', 'OA 9', 2),
+    ('¿Qué signo va al final de una pregunta?', ['.', ',', '?', '!'], '?', 'OA 10', 1),
+    ('"Médico" es una palabra:', ['aguda', 'llana', 'esdrújula', 'sin tilde'], 'esdrújula', 'OA 11', 2),
+    ('"Brillante" en "el sol brillante" es un:', ['adjetivo', 'verbo', 'sustantivo', 'artículo'], 'adjetivo', 'OA 9', 2),
+    ('¿Cuál palabra lleva tilde?', ['mesa', 'lápiz', 'casa', 'perro'], 'lápiz', 'OA 11', 1),
+    ('Un cuento es un texto:', ['narrativo', 'instructivo', 'publicitario', 'científico'], 'narrativo', 'OA 14', 2),
+    ('"¿Cuántos años tienes?" es:', ['una pregunta', 'un comando', 'una exclamación', 'un saludo'], 'una pregunta', 'OA 2', 1)],
+'BASICA_3': [
+    ('Sinónimo de "rápido":', ['veloz', 'lento', 'grande', 'fuerte'], 'veloz', 'OA 8', 1),
+    ('"Había" se escribe con:', ['solo b', 'h y b', 'h y v', 'solo h'], 'h y b', 'OA 13', 2),
+    ('Palabra aguda:', ['árbol', 'canción', 'lápiz', 'médico'], 'canción', 'OA 11', 2),
+    ('El plural de "pez" es:', ['pezes', 'peces', 'pezs', 'pecesos'], 'peces', 'OA 6', 2),
+    ('"Ayer comí pasta" está en tiempo:', ['presente', 'pasado', 'futuro', 'condicional'], 'pasado', 'OA 9', 1),
+    ('En una noticia, el titular sirve para:', ['resumir la noticia principal', 'decorar la página', 'dar la opinión del autor', 'confundir al lector'], 'resumir la noticia principal', 'OA 16', 2),
+    ('"Aunque llovía, salimos." El conector expresa:', ['oposición', 'causa', 'consecuencia', 'adición'], 'oposición', 'OA 21', 2),
+    ('Diminutivo de "perro":', ['perrito', 'perrazo', 'perrero', 'perris'], 'perrito', 'OA 7', 1),
+    ('Un párrafo es:', ['un grupo de oraciones sobre una misma idea', 'una palabra suelta', 'un título', 'un signo de puntuación'], 'un grupo de oraciones sobre una misma idea', 'OA 15', 2),
+    ('"Escritor" pertenece a la familia de palabras de:', ['escribir', 'leer', 'libro', 'papel'], 'escribir', 'OA 7', 2),
+    ('¿Cuál de estas palabras es un verbo?', ['correr', 'bonito', 'mesa', 'rápido'], 'correr', 'OA 9', 1),
+    ('Polisemia significa que una palabra:', ['se escribe igual y tiene varios significados', 'rima con otra', 'es sinónima de otra', 'es antónima de otra'], 'se escribe igual y tiene varios significados', 'OA 8', 3)],
+'BASICA_4': [
+    ('Texto que narra hechos reales o imaginarios:', ['narrativo', 'expositivo', 'argumentativo', 'publicitario'], 'narrativo', 'OA 14', 1),
+    ('"Las estrellas bailan en el cielo" es una:', ['personificación', 'comparación', 'enumeración', 'definición'], 'personificación', 'OA 17', 2),
+    ('"Lunar" pertenece a la familia de palabras de:', ['luna', 'sol', 'mar', 'nube'], 'luna', 'OA 7', 2),
+    ('Palabras homófonas suenan:', ['igual y se escriben distinto', 'distinto y se escriben igual', 'igual y se escriben igual', 'ninguna de las anteriores'], 'igual y se escriben distinto', 'OA 8', 2),
+    ('En "Los niños juegan en el patio", el sujeto es:', ['Los niños', 'juegan', 'el patio', 'en el'], 'Los niños', 'OA 10', 2),
+    ('La idea principal de un texto es:', ['la idea más importante que resume el contenido', 'la primera palabra', 'siempre el título', 'una cita textual'], 'la idea más importante que resume el contenido', 'OA 15', 2),
+    ('Palabra con diptongo:', ['puerta', 'país', 'leer', 'caos'], 'puerta', 'OA 11', 3),
+    ('"Sin embargo" es un conector de:', ['oposición', 'adición', 'tiempo', 'lugar'], 'oposición', 'OA 21', 2),
+    ('¿Qué texto entrega instrucciones paso a paso?', ['una receta de cocina', 'un cuento', 'un poema', 'un anuncio'], 'una receta de cocina', 'OA 14', 1),
+    ('"Relámpago" es una palabra:', ['esdrújula', 'aguda', 'llana', 'sin tilde'], 'esdrújula', 'OA 11', 2),
+    ('La tilde de "sí" (afirmación) se llama tilde:', ['diacrítica', 'prosódica', 'enfática', 'ninguna'], 'diacrítica', 'OA 13', 3),
+    ('Un diccionario sirve para:', ['buscar el significado de las palabras', 'contar historias', 'hacer cálculos', 'dibujar'], 'buscar el significado de las palabras', 'OA 18', 1)],
+'BASICA_5': [
+    ('El propósito de un texto argumentativo es:', ['convencer con razones', 'entretener', 'narrar sucesos', 'describir paisajes'], 'convencer con razones', 'OA 24', 2),
+    ('Inferir significa:', ['sacar conclusiones de lo que se lee', 'copiar el texto', 'traducirlo', 'subrayarlo'], 'sacar conclusiones de lo que se lee', 'OA 16', 2),
+    ('"Por consiguiente" indica:', ['consecuencia', 'causa', 'ejemplo', 'tiempo'], 'consecuencia', 'OA 21', 2),
+    ('¿Cuál frase pertenece a un registro formal?', ['¿Cómo está usted?', '¿Cómo andai?', '¡Qué onda!', '¿Cómo estay?'], '¿Cómo está usted?', 'OA 23', 2),
+    ('"Haber" (de "hay que estudiar") se escribe con:', ['v', 'b', 'h y v', 'h y b'], 'h y b', 'OA 13', 3),
+    ('En "El libro que compré ayer es bueno", la parte "que compré ayer" es una oración:', ['subordinada', 'coordinada', 'principal', 'exclamativa'], 'subordinada', 'OA 10', 3),
+    ('Sinónimo de "iniciar":', ['comenzar', 'terminar', 'seguir', 'dejar'], 'comenzar', 'OA 8', 1),
+    ('Un texto coherente significa que:', ['las ideas se relacionan con orden y sentido', 'todas las oraciones son cortas', 'hay muchos adjetivos', 'el texto es muy largo'], 'las ideas se relacionan con orden y sentido', 'OA 21', 2),
+    ('"Prudente" es un adjetivo que indica una:', ['cualidad', 'acción', 'lugar', 'tiempo'], 'cualidad', 'OA 9', 2),
+    ('El texto expositivo busca:', ['informar y explicar', 'emocionar', 'vender un producto', 'narrar'], 'informar y explicar', 'OA 19', 1),
+    ('"Ella vive ___ de su familia."', ['aparte', 'a parte', 'ambas sirven', 'ninguna sirve'], 'aparte', 'OA 13', 3),
+    ('Paráfrasis es:', ['expresar una idea con otras palabras', 'copiar textualmente', 'resumir en una palabra', 'traducir a otro idioma'], 'expresar una idea con otras palabras', 'OA 16', 3)],
+'BASICA_6': [
+    ('El narrador que conoce los pensamientos de todos los personajes es:', ['omnisciente', 'protagonista', 'observador', 'lector'], 'omnisciente', 'OA 18', 2),
+    ('"Tu sonrisa es un sol" es una:', ['metáfora', 'hipérbole', 'sinécdoque', 'metonimia'], 'metáfora', 'OA 17', 2),
+    ('"Compró un Toyota" en lugar de "un auto" es una:', ['metonimia', 'metáfora', 'comparación', 'ironía'], 'metonimia', 'OA 17', 3),
+    ('Los elementos de la comunicación son:', ['emisor, mensaje, receptor, código y canal', 'solo emisor y receptor', 'título y autor', 'verbo y sujeto'], 'emisor, mensaje, receptor, código y canal', 'OA 1', 1),
+    ('Texto que defiende una tesis con argumentos:', ['argumentativo', 'poético', 'narrativo', 'instructivo'], 'argumentativo', 'OA 24', 1),
+    ('"Antes de que llegaras, yo ya había salido" es una oración:', ['subordinada', 'yuxtapuesta', 'coordinada copulativa', 'exclamativa'], 'subordinada', 'OA 10', 3),
+    ('La función poética del lenguaje se centra en:', ['el mensaje en sí', 'el emisor', 'el receptor', 'el canal'], 'el mensaje en sí', 'OA 1', 3),
+    ('"Barro" (lodo) y "barro" (de barrer) son palabras:', ['homónimas', 'sinónimas', 'antónimas', 'parónimas'], 'homónimas', 'OA 8', 3),
+    ('Un texto cohesivo utiliza:', ['conectores y referentes', 'solo oraciones largas', 'muchos signos de interrogación', 'mayúsculas siempre'], 'conectores y referentes', 'OA 21', 2),
+    ('"A pesar de" expresa:', ['oposición o concesión', 'causa', 'finalidad', 'modo'], 'oposición o concesión', 'OA 21', 2),
+    ('El estilo indirecto libre es propio de:', ['la narración literaria', 'el manual técnico', 'la factura', 'la receta de cocina'], 'la narración literaria', 'OA 18', 3),
+    ('Resumir es:', ['expresar lo esencial de forma breve', 'copiar todo el texto', 'agregar opiniones', 'traducir el texto'], 'expresar lo esencial de forma breve', 'OA 16', 2)]}
+for _lvl in ['BASICA_1', 'BASICA_2', 'BASICA_3', 'BASICA_4', 'BASICA_5', 'BASICA_6']:
+    BASICA_BANK.append(('Matematica', _lvl, 'Diagnóstico Matemática ' + _lvl[7] + '° Básica', 'diagnostico', _MAT[_lvl]))
+    BASICA_BANK.append(('Lenguaje', _lvl, 'Diagnóstico Lenguaje ' + _lvl[7] + '° Básica', 'diagnostico', _LENG[_lvl]))
+
+
 def seed_banco_preguntas(db: Session) -> dict:
     """Banco de preguntas: diagnosticos por nivel y asignatura.
     NOTA: los codigos OA son aproximados segun el programa de estudio;
@@ -253,7 +417,7 @@ def seed_banco_preguntas(db: Session) -> dict:
         ('La intención del autor se refiere a:', ['qué quería lograr con su texto', 'dónde nació', 'su profesión', 'el año de publicación'], 'qué quería lograr con su texto', 'OA 7 (Media)', 2),
         ("'Haber' y 'a ver' se diferencian en que:", ['son iguales', "'haber' es verbo y 'a ver' expresa observación", "'a ver' es verbo", 'ninguna es correcta'], "'haber' es verbo y 'a ver' expresa observación", 'OA 31 (Media)', 3),
         ('En un debate, un argumento de autoridad apela a:', ['las emociones', 'opiniones de expertos o fuentes confiables', 'datos numéricos', 'el humor'], 'opiniones de expertos o fuentes confiables', 'OA 30 (Media)', 3)])]
-    bank = bank + MEDIA_BANK
+    bank = bank + MEDIA_BANK + BASICA_BANK
 
     created = 0
     for subject_name, level, title, kind, qs in bank:
