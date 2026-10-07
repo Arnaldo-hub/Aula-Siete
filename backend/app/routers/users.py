@@ -29,10 +29,11 @@ def create_student(data: StudentIn,
                    user=Depends(require_role("apoderado", "admin")),
                    db: Session = Depends(get_db)):
     birth = date.fromisoformat(data.birth_date) if data.birth_date else None
-    st = models.Student(guardian_id=user.id, run=data.run,
+    run_clean = (data.run or "").strip() or None   # vacio -> NULL (sin RUN)
+    st = models.Student(guardian_id=user.id, run=run_clean,
                         birth_date=birth, level=data.level)
     if data.full_name:
-        base = (data.run or secrets.token_hex(4)).replace(".", "").replace("-", "")
+        base = (run_clean or secrets.token_hex(4)).replace(".", "").replace("-", "")
         email = f"alumno.{base}@alumno.aulasiete.cl"
         if db.query(models.User).filter_by(email=email).first():
             email = f"alumno.{secrets.token_hex(4)}@alumno.aulasiete.cl"
