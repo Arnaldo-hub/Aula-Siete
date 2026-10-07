@@ -51,12 +51,28 @@ export default function Dashboard() {
     } catch (e2) { setErr(e2.message) }
   }
 
+  const enrolledIds = (sid) => new Set(
+    (myCourses.find((m) => m.student_id === sid)?.courses || []).map((c) => c.course_id))
+
   async function enroll(student, course) {
     setMsg(''); setErr('')
     try {
       await api(`/enroll?student_id=${student.id}&course_id=${course.id}`, { method: 'POST' })
-      setMsg(`${student.name} inscrito en "${course.title}" ✅`)
+      setMsg(`${student.name} inscrito en "${course.title}" ✅`); load()
     } catch (e2) { setErr(e2.message) }
+  }
+
+  async function enrollAll(student) {
+    setMsg(''); setErr('')
+    const courses = coursesByLevel[student.level] || []
+    let ok = 0
+    for (const c of courses) {
+      try {
+        await api(`/enroll?student_id=${student.id}&course_id=${c.id}`, { method: 'POST' })
+        ok++
+      } catch (e2) { if (!String(e2.message).includes('Ya inscrito')) setErr(e2.message) }
+    }
+    setMsg(`${student.name} inscrito en ${ok} asignatura(s) de ${nivelLabel(student.level)} ✅`); load()
   }
 
   async function verProgreso(s) {
@@ -107,12 +123,29 @@ export default function Dashboard() {
                   <td><strong>{s.name}</strong></td>
                   <td>{nivelLabel(s.level)}</td>
                   <td>
-                    {(coursesByLevel[s.level] || []).length === 0
-                      ? <span className="muted">Sin cursos disponibles aún</span>
-                      : (coursesByLevel[s.level] || []).map((c) => (
-                          <button key={c.id} className="btn btn-sm" style={{ marginRight: '.4rem', marginBottom: '.3rem' }}
-                            onClick={() => enroll(s, c)}>Inscribir: {c.title}</button>
-                        ))}
+                    {(coursesByLevel[s.level] || []).length === 0 && (
+                      <span className="muted">Sin cursos disponibles aún</span>
+                    )}
+                    {(coursesByLevel[s.level] || []).length > 0 && (
+                      <div>
+                        {enrolledIds(s.id).size < (coursesByLevel[s.level] || []).length && (
+                          <button className="btn btn-primary btn-sm" style={{ marginBottom: '.4rem' }}
+                            onClick={() => enrollAll(s)}>
+                            📚 Inscribir en TODAS las asignaturas ({(coursesByLevel[s.level] || []).length})
+                          </button>
+                        )}
+                        <div>
+                          {(coursesByLevel[s.level] || []).map((c) => (
+                            <span key={c.id} style={{ display: 'inline-block', margin: '0 .4rem .3rem 0' }}>
+                              {enrolledIds(s.id).has(c.id)
+                                ? <span className="chip" style={{ fontSize: '.8rem' }}>✅ {c.title}</span>
+                                : <button className="btn btn-sm"
+                                    onClick={() => enroll(s, c)}>Inscribir: {c.title}</button>}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </td>
                   <td><button className="btn btn-sm" onClick={() => verProgreso(s)}>Ver progreso</button></td>
                 </tr>
