@@ -1,6 +1,6 @@
-from datetime import datetime
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from ..database import get_db
 from .. import models
@@ -12,8 +12,8 @@ class LiveClassIn(BaseModel):
     course_id: int
     lesson_id: int | None = None
     title: str
-    starts_at: datetime
-    ends_at: datetime
+    starts_at: str
+    ends_at: str
 
 class RecordingIn(BaseModel):
     course_id: int
@@ -30,7 +30,6 @@ class MaterialIn(BaseModel):
     lesson_id: int | None = None
 
 def _jitsi_url(course_id: int, title: str) -> str:
-    # Sala determinística por curso; en producción: Daily.co o Jitsi self-hosted
     slug = "".join(c if c.isalnum() else "-" for c in title.lower()).strip("-")
     return f"https://meet.jit.si/aulasite-c{course_id}-{slug}"
 
@@ -47,8 +46,9 @@ def schedule_live(data: LiveClassIn,
 
 @router.get("/live-classes")
 def upcoming(db: Session = Depends(get_db)):
+    # func.now(): el filtro lo hace PostgreSQL (sin problemas de zona horaria)
     rows = (db.query(models.LiveClass)
-            .filter(models.LiveClass.starts_at >= datetime.utcnow())
+            .filter(models.LiveClass.starts_at >= func.now())
             .order_by(models.LiveClass.starts_at).limit(50).all())
     return [{"id": r.id, "title": r.title, "course_id": r.course_id,
              "starts_at": r.starts_at.isoformat(), "room_url": r.room_url,
