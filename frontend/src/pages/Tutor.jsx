@@ -1,6 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
 import { api } from '../api'
 
+const LEVELS = [
+  ['PREKINDER', 'Prekínder'], ['KINDER', 'Kínder'],
+  ['BASICA_1', '1° Básico'], ['BASICA_2', '2° Básico'], ['BASICA_3', '3° Básico'],
+  ['BASICA_4', '4° Básico'], ['BASICA_5', '5° Básico'], ['BASICA_6', '6° Básico'],
+  ['BASICA_7', '7° Básico'], ['BASICA_8', '8° Básico'],
+  ['MEDIA_1', '1° Medio'], ['MEDIA_2', '2° Medio'], ['MEDIA_3', '3° Medio'], ['MEDIA_4', '4° Medio'],
+]
+const nivelLabel = (lv) => (LEVELS.find(([k]) => k === lv) || [null, lv || '—'])[1]
+
 const fld = { width: '100%', padding: '.6rem .8rem', borderRadius: '10px', border: '1.5px solid var(--border)', marginBottom: '.7rem', fontFamily: 'inherit' }
 
 export default function Tutor() {
@@ -70,10 +79,10 @@ function Chat() {
       <div style={{ display: 'flex', gap: '.8rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
         <select value={sid} onChange={e => setSid(e.target.value)} style={{ ...fld, width: 'auto', margin: 0 }}>
           <option value="">Sin alumno asociado</option>
-          {students.map(s => <option key={s.id} value={s.id}>Alumno #{s.id} - {s.level}</option>)}
+          {students.map(s => <option key={s.id} value={s.id}>{s.name} — {nivelLabel(s.level)}</option>)}
         </select>
         <select value={level} onChange={e => setLevel(e.target.value)} style={{ ...fld, width: 'auto', margin: 0 }}>
-          {['BASICA_1','BASICA_2','BASICA_3','BASICA_4','BASICA_5','BASICA_6','BASICA_7','BASICA_8','MEDIA_1','MEDIA_2','MEDIA_3','MEDIA_4'].map(l => <option key={l}>{l}</option>)}
+          {LEVELS.map(([k, v]) => <option key={k} value={k}>{v}</option>)}
         </select>
       </div>
       {err && <div className="error">{err}</div>}
@@ -121,7 +130,7 @@ function Generador() {
           <option>Matematica</option><option>Lenguaje</option><option>Historia</option><option>Ciencias</option><option>Ingles</option>
         </select>
         <select style={fld} value={f.level} onChange={e => setF({ ...f, level: e.target.value })}>
-          {['BASICA_1','BASICA_2','BASICA_3','BASICA_4','BASICA_5','BASICA_6','BASICA_7','BASICA_8','MEDIA_1','MEDIA_2','MEDIA_3','MEDIA_4'].map(l => <option key={l}>{l}</option>)}
+          {LEVELS.map(([k, v]) => <option key={k} value={k}>{v}</option>)}
         </select>
         <select style={fld} value={f.kind} onChange={e => setF({ ...f, kind: e.target.value })}>
           <option value="guia">Guía de trabajo</option><option value="planificacion">Planificación de clase</option><option value="ejercicios">Set de ejercicios</option>
@@ -157,7 +166,7 @@ function Ensayo() {
       <p className="muted">El alumno escribe su ensayo, la IA lo corrige con rúbrica PAES: comprensión, desarrollo, organización y lenguaje.</p>
       {err && <div className="error">{err}</div>}
       <select value={level} onChange={e => setLevel(e.target.value)} style={{ ...fld, width: 'auto' }}>
-        {['BASICA_7','BASICA_8','MEDIA_1','MEDIA_2','MEDIA_3','MEDIA_4'].map(l => <option key={l}>{l}</option>)}
+        {LEVELS.filter(([k]) => !['PREKINDER','KINDER','BASICA_1','BASICA_2','BASICA_3','BASICA_4','BASICA_5','BASICA_6'].includes(k)).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
       </select>
       <textarea style={{ ...fld, minHeight: '160px' }} value={text} onChange={e => setText(e.target.value)}
         placeholder="Pega aquí el texto del ensayo del alumno..." required />

@@ -1,6 +1,15 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api'
 
+const LEVELS = [
+  ['PREKINDER', 'Prekínder'], ['KINDER', 'Kínder'],
+  ['BASICA_1', '1° Básico'], ['BASICA_2', '2° Básico'], ['BASICA_3', '3° Básico'],
+  ['BASICA_4', '4° Básico'], ['BASICA_5', '5° Básico'], ['BASICA_6', '6° Básico'],
+  ['BASICA_7', '7° Básico'], ['BASICA_8', '8° Básico'],
+  ['MEDIA_1', '1° Medio'], ['MEDIA_2', '2° Medio'], ['MEDIA_3', '3° Medio'], ['MEDIA_4', '4° Medio'],
+]
+const nivelLabel = (lv) => (LEVELS.find(([k]) => k === lv) || [null, lv || '—'])[1]
+
 export default function Dudas() {
   const [doubts, setDoubts] = useState([])
   const [students, setStudents] = useState([])
@@ -33,6 +42,8 @@ export default function Dudas() {
     } catch (e2) { setMsg('Error: ' + e2.message) }
   }
 
+  const nameOf = (id) => students.find(x => x.id === id)?.name || `Alumno #${id}`
+
   return (
     <div>
       <h2 className="page-title">Dudas express con docente</h2>
@@ -45,7 +56,7 @@ export default function Dudas() {
             <label style={{fontSize: '.85rem', fontWeight: 600}}>Alumno</label>
             <select value={sid} onChange={e => setSid(e.target.value)} required
                     style={{width: '100%', padding: '.7rem', borderRadius: '10px', border: '1.5px solid var(--border)', marginBottom: '1rem'}}>
-              {students.map(s => <option key={s.id} value={s.id}>Alumno #{s.id} - Nivel {s.level}</option>)}
+              {students.map(s => <option key={s.id} value={s.id}>{s.name} — {nivelLabel(s.level)}</option>)}
             </select>
             <label style={{fontSize: '.85rem', fontWeight: 600}}>Pregunta</label>
             <textarea value={question} onChange={e => setQuestion(e.target.value)} required rows={3}
@@ -61,7 +72,7 @@ export default function Dudas() {
         {doubts.length === 0 && <p className="muted">No hay dudas registradas.</p>}
         {doubts.map(d => (
           <div key={d.id} className="doubt">
-            <p><strong>Pregunta</strong> <span className="muted">(Alumno #{d.student_id} · {d.date})</span></p>
+            <p><strong>Pregunta</strong> <span className="muted">({nameOf(d.student_id)} · {d.date})</span></p>
             <p style={{marginBottom: '.8rem'}}>{d.question}</p>
             {d.answer ? (
               <div className="answer-box"><strong>Respuesta del docente:</strong> {d.answer}</div>

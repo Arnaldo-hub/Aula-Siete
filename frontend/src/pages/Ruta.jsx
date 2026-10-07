@@ -1,6 +1,15 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api'
 
+const LEVELS = [
+  ['PREKINDER', 'Prekínder'], ['KINDER', 'Kínder'],
+  ['BASICA_1', '1° Básico'], ['BASICA_2', '2° Básico'], ['BASICA_3', '3° Básico'],
+  ['BASICA_4', '4° Básico'], ['BASICA_5', '5° Básico'], ['BASICA_6', '6° Básico'],
+  ['BASICA_7', '7° Básico'], ['BASICA_8', '8° Básico'],
+  ['MEDIA_1', '1° Medio'], ['MEDIA_2', '2° Medio'], ['MEDIA_3', '3° Medio'], ['MEDIA_4', '4° Medio'],
+]
+const nivelLabel = (lv) => (LEVELS.find(([k]) => k === lv) || [null, lv || '—'])[1]
+
 export default function Ruta() {
   const [students, setStudents] = useState([])
   const [sid, setSid] = useState('')
@@ -36,14 +45,14 @@ export default function Ruta() {
         <section className="card">
           <label style={{ fontSize: '.85rem', fontWeight: 600 }}>Alumno</label>
           <select value={sid} onChange={e => setSid(e.target.value)} style={{ width: '100%', padding: '.6rem .8rem', borderRadius: '10px', border: '1.5px solid var(--border)' }}>
-            {students.map(s => <option key={s.id} value={s.id}>Alumno #{s.id} - Nivel {s.level}</option>)}
+            {students.map(s => <option key={s.id} value={s.id}>{s.name} — {nivelLabel(s.level)}</option>)}
           </select>
         </section>
       )}
 
       <section className="card">
         <h3>Pendientes ({pending.length})</h3>
-        {pending.length === 0 && <p className="muted">Sin tareas pendientes. Rinde un diagnostico para generar tu ruta.</p>}
+        {pending.length === 0 && <p className="muted">Sin tareas pendientes. Rinde un diagnostico de tu nivel para generar tu ruta.</p>}
         {pending.map(i => (
           <div key={i.id} className="doubt" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
             <div>
