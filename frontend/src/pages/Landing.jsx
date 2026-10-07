@@ -21,6 +21,7 @@ export default function Landing() {
         <div className="nav-links">
           <a href="#segmentos">Para quien es</a>
           <a href="#planes">Planes</a>
+          <a href="/examenes-libres-chile.html">Guía gratuita</a>
           <a href="#faq">Preguntas</a>
         </div>
         <Link to="/registro" className="btn btn-outline btn-sm" style={{marginLeft:'1rem'}}>Crear cuenta</Link>
@@ -49,8 +50,9 @@ export default function Landing() {
         <div className="features">
           <div className="feature"><div className="ico">🎥</div><h3>Clases en vivo, grupos reducidos</h3><p>Maximo 10 estudiantes por sala, con camara y microfono: participacion real, no una flecha mas.</p></div>
           <div className="feature"><div className="ico">📼</div><h3>Biblioteca de grabaciones</h3><p>Todas las clases quedan grabadas y disponibles para repasar cuando quiera.</p></div>
-          <div className="feature"><div className="ico">📝</div><h3>Simulaciones de examen</h3><p>Pruebas de practica con evaluacion automatica, alineadas al formato de los Examenes Libres.</p></div>
-          <div className="feature"><div className="ico">📈</div><h3>Reportes para apoderados</h3><p>Progreso por lecciones y promedio en simulaciones, siempre visible para la familia.</p></div>
+          <div className="feature"><div className="ico">📝</div><h3>Simulaciones de examen</h3><p>Pruebas de practica con evaluacion automatica, alineadas al formato de los Examenes Libres. Diagnósticos por nivel y asignatura.</p></div>
+          <div className="feature"><div className="ico">🧭</div><h3>Ruta personalizada</h3><p>De cada diagnóstico nace una ruta de refuerzo por objetivo de aprendizaje: se practica justo lo que falta.</p></div>
+          <div className="feature"><div className="ico">📈</div><h3>Reportes para apoderados</h3><p>Progreso por lecciones y promedio en simulaciones: la evidencia que el Mineduc pide en la entrevista de validación.</p></div>
         </div>
       </section>
 
@@ -67,6 +69,22 @@ export default function Landing() {
             <h3>🏠 Educamos en casa (homeschool)</h3>
             <p>Familias que educan en casa y validan el ano mediante Examenes Libres. Plan anual con planificacion, clases y evidencia de progreso para rendir con confianza.</p>
             <a className="btn btn-outline" href={WSP} target="_blank" rel="noreferrer">Conocer el plan anual</a>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2 className="section-title">¿Buscas un colegio digital en Chile?</h2>
+        <p className="section-sub">Antes de decidir, esto es lo que la norma permite — y lo que tu hijo realmente necesita.</p>
+        <div className="segments">
+          <div className="segment">
+            <h3>🏛️ Lo que dice la norma</h3>
+            <p>El Mineduc no reconoce colegios 100% virtuales: ningún establecimiento online puede certificar estudios por sí mismo. La vía legal para estudiar desde casa es la validación por <strong>Exámenes Libres</strong>, con pruebas presenciales. Desconfía de quien prometa lo contrario.</p>
+          </div>
+          <div className="segment">
+            <h3>🎓 Lo que hacemos nosotros</h3>
+            <p>Preparamos a tu hijo para aprobar esas pruebas: clases en vivo, simulaciones ilimitadas, ruta personalizada y <strong>reportes mensuales</strong> que sirven de evidencia en la entrevista de validación. Precios claros, sin reuniones de venta.</p>
+            <a className="btn btn-primary" href="/examenes-libres-chile.html">Leer la guía completa (gratis)</a>
           </div>
         </div>
       </section>
@@ -126,12 +144,15 @@ export default function Landing() {
           <details><summary>¿Que necesita mi hijo para tomar las clases?</summary><p>Un computador, tablet o celular con internet, y una cuenta de apoderado en nuestra plataforma. Las clases en vivo se realizan por videollamada con camara y microfono.</p></details>
           <details><summary>¿Las clases quedan grabadas?</summary><p>Si. Todas las clases en vivo quedan en la biblioteca para repasar las veces que sea necesario.</p></details>
           <details><summary>¿Puedo pausar mi suscripcion?</summary><p>Si. Los meses pagados y no utilizados se congelan y puedes reanudarlos cuando lo necesites. Escríbenos por WhatsApp para gestionarlo.</p></details>
+          <details><summary>¿Cuánto cuesta preparar los Exámenes Libres?</summary><p>Depende del apoyo: planes desde $49.900/mes con clases en vivo, simulaciones ilimitadas y reportes. La inscripción en Ayuda Mineduc es gratuita.</p></details>
+          <details><summary>¿Qué pasa si mi hijo reprueba un examen?</summary><p>Puede volver a inscribirse y rendir en la próxima convocatoria. Nuestro sistema detecta los objetivos de aprendizaje débiles y arma una ruta de refuerzo para esas asignaturas.</p></details>
+          <details><summary>¿Desde qué edad se puede rendir examen libre?</summary><p>Desde 1° básico —el Mineduc exige que el menor ya sepa leer y escribir en español— hasta 4° medio, con las asignaturas obligatorias de cada nivel: 4 en 1°-6° básico y 5 desde 7° básico, donde se suma Inglés.</p></details>
         </div>
       </section>
 
       <section>
         <h2 className="section-title">Cobertura completa</h2>
-        <p className="section-sub">Desde educacion parvularia hasta cuarto medio.</p>
+        <p className="section-sub">Prekínder a 4° medio. Diagnósticos y simulaciones en las asignaturas obligatorias de cada nivel.</p>
         <div className="levels">
           <span className="chip">Prekinder</span><span className="chip">Kinder</span>
           <span className="chip">1° a 8° Basica</span><span className="chip">1° a 4° Media</span>
