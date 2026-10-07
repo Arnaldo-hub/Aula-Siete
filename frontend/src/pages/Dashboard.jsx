@@ -21,11 +21,13 @@ export default function Dashboard() {
   const [ns, setNs] = useState({ run: '', birth_date: '', level: 'BASICA_1', full_name: '' })
   const [coursesByLevel, setCoursesByLevel] = useState({})
   const [reports, setReports] = useState({})
+  const [myCourses, setMyCourses] = useState([])
 
   function load() {
     api('/users/me').then(setMe).catch(() => {})
     api('/users/students').then(setStudents).catch(() => {})
     api('/live-classes').then(setLives).catch(() => {})
+    api('/levels/my-courses').then(setMyCourses).catch(() => {})
   }
   useEffect(() => { load() }, [])
 
@@ -134,6 +136,41 @@ export default function Dashboard() {
                 <p key={i} style={{ margin: '.2rem 0', fontSize: '.9rem' }}>
                   {a.exam}: <strong>{a.score}%</strong> <span className="muted">({a.date?.slice(0, 10)})</span>
                 </p>
+              ))}
+            </div>
+          ))}
+        </section>
+      )}
+
+      {myCourses.some((m) => m.courses.length > 0) && (
+        <section className="card">
+          <h3>📖 Mis cursos y materiales</h3>
+          {myCourses.filter((m) => m.courses.length > 0).map((m) => (
+            <div key={m.student_id} style={{ marginBottom: '1.2rem' }}>
+              <h4 style={{ margin: '0 0 .6rem' }}>🎒 {m.student_name} — {m.level_label}</h4>
+              {m.courses.map((c) => (
+                <div key={c.course_id} className="card" style={{ background: 'var(--bg-soft)', marginBottom: '.6rem', padding: '.9rem 1rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '.4rem' }}>
+                    <strong>{c.subject}</strong>
+                    <span className="muted" style={{ fontSize: '.85rem' }}>👩‍🏫 {c.teacher}</span>
+                  </div>
+                  {c.materials.length === 0 && c.recordings.length === 0 && (
+                    <p className="muted" style={{ margin: '.5rem 0 0', fontSize: '.85rem' }}>
+                      El profesor aún no sube material a este curso.
+                    </p>
+                  )}
+                  {c.materials.map((mat) => (
+                    <p key={mat.id} style={{ margin: '.35rem 0', fontSize: '.9rem' }}>
+                      📎 <a href={mat.file_url} target="_blank" rel="noreferrer">{mat.title}</a>
+                      <span className="muted" style={{ fontSize: '.78rem' }}> ({mat.file_type})</span>
+                    </p>
+                  ))}
+                  {c.recordings.map((r) => (
+                    <p key={r.id} style={{ margin: '.35rem 0', fontSize: '.9rem' }}>
+                      📼 <a href={r.video_url} target="_blank" rel="noreferrer">{r.title}</a>
+                    </p>
+                  ))}
+                </div>
               ))}
             </div>
           ))}
