@@ -60,34 +60,14 @@ def start(exam_id: int, db: Session = Depends(get_db)):
             "questions": [{"id": q.id, "prompt": q.prompt, "options": q.options}
                           for q in qs]}
 
-# ---- Evaluación automática ----
-@router.post("/{exam_id}/submit")
-def submit(exam_id: int, student_id: int, answers: dict[str, str],
-           user: models.User = Depends(require_role("apoderado", "admin", "alumno")),
-           db: Session = Depends(get_db)):
-    if user.role == "apoderado":
-        guardian_of(student_id, user, db)
-    qs = db.query(models.Question).filter_by(exam_id=exam_id).all()
-    if not qs:
-        raise HTTPException(404, "Simulación sin preguntas")
-    correct = sum(1 for q in qs if answers.get(str(q.id)) == q.answer)
-    score = round(correct / len(qs) * 100, 2)
-    att = models.ExamAttempt(student_id=student_id, exam_id=exam_id,
-                             finished_at=datetime.utcnow(), score=score,
-                             answers=answers)
-    db.add(att); db.commit(); db.refresh(att)
-    return {"attempt_id": att.id, "score": score, "total": len(qs),
-            "correct": correct}
-
-
 def _build_path(db: Session, student_id: int, exam_id: int, answers: dict) -> list:
-    """A partir de las respuestas del diagnostico, crea items de ruta por OA debil."""
+    """A partir de las respuestas del diagnóstico, crea items de ruta por OA débil."""
     qs = db.query(models.Question).filter_by(exam_id=exam_id).all()
     weak = []
     for q in qs:
         if answers.get(str(q.id)) != q.answer and q.oa:
             weak.append(q.oa)
-    weak = list(dict.fromkeys(weak))   # unicos, conservando orden
+    weak = list(dict.fromkeys(weak))
     created = []
     for oa in weak:
         exists = db.query(models.PathItem).filter_by(student_id=student_id, oa=oa,
@@ -106,10 +86,25 @@ def _build_path(db: Session, student_id: int, exam_id: int, answers: dict) -> li
     db.commit()
     return created
 
-
-class PathDone(BaseModel):
-    pass
-
+# ---- Evaluación automática + generación de ruta ----
+@router.post("/{exam_id}/submit")
+def submit(exam_id: int, student_id: int, answers: dict[str, str],
+           user: models.User = Depends(require_role("apoderado", "admin", "alumno")),
+           db: Session = Depends(get_db)):
+    if user.role == "apoderado":
+        guardian_of(student_id, user, db)
+    qs = db.query(models.Question).filter_by(exam_id=exam_id).all()
+    if not qs:
+        raise HTTPException(404, "Simulación sin preguntas")
+    correct = sum(1 for q in qs if answers.get(str(q.id)) == q.answer)
+    score = round(correct / len(qs) * 100, 2)
+    att = models.ExamAttempt(student_id=student_id, exam_id=exam_id,
+                             finished_at=datetime.utcnow(), score=score,
+                             answers=answers)
+    db.add(att); db.commit(); db.refresh(att)
+    weak = _build_path(db, student_id, exam_id, answers)
+    return {"attempt_id": att.id, "score": score, "total": len(qs),
+            "correct": correct, "weak_oa": weak}
 
 @router.get("/path/{student_id}")
 def my_path(student_id: int,
@@ -121,7 +116,6 @@ def my_path(student_id: int,
             .order_by(models.PathItem.id.desc()).limit(60).all())
     return [{"id": r.id, "oa": r.oa, "title": r.title, "status": r.status,
              "material_id": r.material_id} for r in rows]
-
 
 @router.post("/path/{item_id}/done")
 def path_done(item_id: int,

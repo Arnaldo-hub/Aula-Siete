@@ -42,8 +42,13 @@ def list_courses(level: str | None = None, db: Session = Depends(get_db)):
     q = db.query(models.Course)
     if level:
         q = q.filter_by(level=level)
-    return [{"id": c.id, "title": c.title, "level": c.level,
-             "description": c.description} for c in q.all()]
+    out = []
+    for c in q.all():
+        t = db.get(models.User, c.teacher_id) if c.teacher_id else None
+        out.append({"id": c.id, "title": c.title, "level": c.level,
+                    "description": c.description,
+                    "teacher": t.full_name if t else "Por asignar"})
+    return out
 
 # ---- Panel del profesor: mis cursos + alumnos ----
 @router.get("/my/courses")
