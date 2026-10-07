@@ -25,6 +25,7 @@ export default function AdminPanel() {
   const [filter, setFilter] = useState('')
   const [msg, setMsg] = useState('')
   const [err, setErr] = useState('')
+  const [reseedMsg, setReseedMsg] = useState('')
   const [seed, setSeed] = useState({ level: 'BASICA_8', teacher_id: '' })
   const [single, setSingle] = useState({ name: '', level: 'BASICA_8', teacher_id: '' })
   const [nu, setNu] = useState({ email: '', password: '', full_name: '', role: 'profesor' })
@@ -37,6 +38,15 @@ export default function AdminPanel() {
     api('/levels/board').then(setBoard).catch(() => {})
   }
   useEffect(() => { load() }, [])
+
+  async function reseed() {
+    setReseedMsg('Cargando banco, espera un momento...'); setErr('')
+    try {
+      const r = await api('/admin/reseed', { method: 'POST' })
+      setReseedMsg(`Banco actualizado: ${r.exams_created || 0} nuevas simulaciones cargadas`)
+      load()
+    } catch (e2) { setErr(e2.message); setReseedMsg('') }
+  }
 
   async function createUser(e) {
     e.preventDefault(); setMsg(''); setErr('')
@@ -108,7 +118,11 @@ export default function AdminPanel() {
 
   return (
     <div>
-      <h2 className="page-title">⚙️ Panel de administración</h2>
+      <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+        <h2 className="page-title" style={{ margin: 0 }}>⚙️ Panel de administración</h2>
+        <button className="btn btn-sm" onClick={reseed}>📥 Recargar banco de preguntas</button>
+      </div>
+      {reseedMsg && <div className="card ok">{reseedMsg}</div>}
       {msg && <div className="card ok">{msg}</div>}
       {err && <div className="error">{err}</div>}
 
