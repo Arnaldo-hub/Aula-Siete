@@ -139,8 +139,11 @@ export default function Dashboard() {
                             <span key={c.id} style={{ display: 'inline-block', margin: '0 .4rem .3rem 0' }}>
                               {enrolledIds(s.id).has(c.id)
                                 ? <span className="chip" style={{ fontSize: '.8rem' }}>✅ {c.title}</span>
-                                : <button className="btn btn-sm"
-                                    onClick={() => enroll(s, c)}>Inscribir: {c.title}</button>}
+                                : <span>
+                                    <button className="btn btn-sm"
+                                      onClick={() => enroll(s, c)}>Inscribir: {c.title}</button>
+                                    <div className="muted" style={{ fontSize: '.7rem', marginTop: '.1rem' }}>👩‍🏫 {c.teacher || 'Por asignar'}</div>
+                                  </span>}
                             </span>
                           ))}
                         </div>

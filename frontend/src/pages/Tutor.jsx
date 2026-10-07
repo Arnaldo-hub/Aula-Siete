@@ -52,7 +52,7 @@ function Chat() {
   const [err, setErr] = useState('')
   const boxRef = useRef(null)
   useEffect(() => { boxRef.current?.scrollTo(0, 99999) }, [msgs])
-  useEffect(() => { api('/users/students').then(s => { setStudents(s); if (s[0]) setSid(String(s[0].id)) }).catch(() => {}) }, [])
+  useEffect(() => { api('/users/students').then(s => { setStudents(s); if (s[0]) { setSid(String(s[0].id)); setLevel(s[0].level) } }).catch(() => {}) }, [])
 
   async function send(e) {
     e.preventDefault()
@@ -77,8 +77,8 @@ function Chat() {
   return (
     <section className="card">
       <div style={{ display: 'flex', gap: '.8rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
-        <select value={sid} onChange={e => setSid(e.target.value)} style={{ ...fld, width: 'auto', margin: 0 }}>
-          <option value="">Sin alumno asociado</option>
+        <select value={sid} onChange={e => { setSid(e.target.value); const st = students.find(x => String(x.id) === e.target.value); if (st) setLevel(st.level) }} style={{ ...fld, width: 'auto', margin: 0 }}>
+          <option value="">Sin alumno asociado (elige el nivel a la derecha)</option>
           {students.map(s => <option key={s.id} value={s.id}>{s.name} — {nivelLabel(s.level)}</option>)}
         </select>
         <select value={level} onChange={e => setLevel(e.target.value)} style={{ ...fld, width: 'auto', margin: 0 }}>

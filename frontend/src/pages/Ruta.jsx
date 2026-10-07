@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { api } from '../api'
 
 const LEVELS = [
@@ -40,6 +41,16 @@ export default function Ruta() {
         Generada automaticamente segun los OA debiles detectados en el ultimo diagnostico.
       </p>
       {err && <div className="error">{err}</div>}
+
+      <section className="card" style={{ background: 'var(--bg-soft)' }}>
+        <h3>¿Cómo funciona la ruta?</h3>
+        <p className="muted" style={{ margin: 0 }}>
+          Cuando tu hijo rinde un diagnóstico en <strong>Simulaciones</strong>, el sistema detecta
+          los objetivos de aprendizaje (OA) que falló y crea aquí tareas de refuerzo a medida.
+          Cuando las complete, aprieta <strong>"Marcar completado"</strong> y la ruta se actualiza.
+        </p>
+        <Link className="btn btn-primary btn-sm" to="/simulaciones" style={{ marginTop: '.7rem', display: 'inline-block' }}>📝 Rendir un diagnóstico ahora</Link>
+      </section>
 
       {students.length > 1 && (
         <section className="card">
