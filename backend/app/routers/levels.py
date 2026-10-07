@@ -159,3 +159,41 @@ def board(user: models.User = Depends(require_role("profesor", "admin")),
                           "level": LEVEL_LABELS.get(s.level, s.level)} for s, u in studs],
         })
     return out
+
+
+@router.get("/my-courses")
+def my_courses_apoderado(user: models.User = Depends(require_role("apoderado")),
+                         db: Session = Depends(get_db)):
+    """Vista del apoderado: por cada hijo, sus cursos inscritos con
+    materiales, grabaciones y docente. Asi ve lo que sube el profesor."""
+    out = []
+    for st in db.query(models.Student).filter_by(guardian_id=user.id).all():
+        st_user = db.get(models.User, st.user_id) if st.user_id else None
+        courses = []
+        for e in db.query(models.Enrollment).filter_by(student_id=st.id).all():
+            c = db.get(models.Course, e.course_id)
+            if not c:
+                continue
+            subj = db.get(models.Subject, c.subject_id)
+            teacher = db.get(models.User, c.teacher_id) if c.teacher_id else None
+            mats = (db.query(models.Material).filter_by(course_id=c.id)
+                    .order_by(models.Material.id.desc()).all())
+            recs = (db.query(models.Recording).filter_by(course_id=c.id)
+                    .order_by(models.Recording.id.desc()).all())
+            courses.append({
+                "course_id": c.id,
+                "title": c.title,
+                "subject": subj.name if subj else "",
+                "teacher": teacher.full_name if teacher else "Sin asignar",
+                "materials": [{"id": m.id, "title": m.title, "file_url": m.file_url,
+                               "file_type": m.file_type} for m in mats],
+                "recordings": [{"id": r.id, "title": r.title, "video_url": r.video_url}
+                               for r in recs],
+            })
+        out.append({
+            "student_id": st.id,
+            "student_name": st_user.full_name if st_user else f"Alumno #{st.id}",
+            "level_label": LEVEL_LABELS.get(st.level, st.level),
+            "courses": courses,
+        })
+    return out
