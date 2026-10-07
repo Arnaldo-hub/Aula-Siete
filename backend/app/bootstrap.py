@@ -207,6 +207,54 @@ def seed_banco_preguntas(db: Session) -> dict:
         ('La intención del autor se refiere a:', ['qué quería lograr con su texto', 'dónde nació', 'su profesión', 'el año de publicación'], 'qué quería lograr con su texto', 'OA 7 (Media)', 2),
         ("'Haber' y 'a ver' se diferencian en que:", ['son iguales', "'haber' es verbo y 'a ver' expresa observación", "'a ver' es verbo", 'ninguna es correcta'], "'haber' es verbo y 'a ver' expresa observación", 'OA 31 (Media)', 3),
         ('En un debate, un argumento de autoridad apela a:', ['las emociones', 'opiniones de expertos o fuentes confiables', 'datos numéricos', 'el humor'], 'opiniones de expertos o fuentes confiables', 'OA 30 (Media)', 3)])]
+
+MEDIA_BANK = []
+_historia_media = [
+    ('¿Qué conflicto bélico enfrentó a Chile contra Bolivia y Perú entre 1879 y 1884?', ['Guerra del Pacífico', 'Guerra de independencia', 'Guerra civil chilena', 'Guerra hispano-americana'], 'Guerra del Pacífico', 'OA 1', 1),
+    ('La Constitución chilena de 1925 estableció:', ['el parlamentarismo', 'la presidencia de la República con separación de poderes', 'el monopolio del Congreso', 'el voto calificado'], 'la presidencia de la República con separación de poderes', 'OA 2', 2),
+    ('La crisis económica mundial de 1929 afectó a Chile principalmente por:', ['la caída del precio del salitre y el cobre', 'el fin de la agricultura', 'la invasión extranjera', 'el cierre de los bancos europeos en Chile'], 'la caída del precio del salitre y el cobre', 'OA 3', 2),
+    ('El Frente Popular (1938) se caracterizó por:', ['el regreso de los militares', 'reformas sociales y el triunfo electoral de la centroizquierda', 'la abolición del Congreso', 'la privatización total'], 'reformas sociales y el triunfo electoral de la centroizquierda', 'OA 4', 2),
+    ('El proceso de industrialización chilena del siglo XX concentró la producción en:', ['las regiones del norte grande', 'el área metropolitana de Santiago y Valparaíso', 'la Araucanía', 'Chiloé'], 'el área metropolitana de Santiago y Valparaíso', 'OA 5', 2),
+    ('La reforma agraria de los años 1960-1973 buscó:', ['aumentar los latifundios', 'redistribuir la tierra y modernizar el campo', 'eliminar el trabajo rural', 'nacionalizar las mineras del cobre únicamente'], 'redistribuir la tierra y modernizar el campo', 'OA 6', 2),
+    ('La Guerra Fría fue:', ['un conflicto armado directo entre EE.UU. y la URSS', 'un enfrentamiento ideológico, político y económico sin guerra directa', 'una alianza militar mundial', 'una guerra comercial europea'], 'un enfrentamiento ideológico, político y económico sin guerra directa', 'OA 7', 1),
+    ('La descolonización de África y Asia ocurrió principalmente:', ['en el siglo XIX', 'después de la Segunda Guerra Mundial', 'en el siglo XXI', 'durante la Primera Guerra Mundial'], 'después de la Segunda Guerra Mundial', 'OA 8', 2),
+    ('El golpe de Estado de 1973 en Chile derrocó al gobierno de:', ['Eduardo Frei Montalva', 'Salvador Allende', 'Jorge Alessandri', 'Michelle Bachelet'], 'Salvador Allende', 'OA 9', 1),
+    ('Durante la dictadura militar (1973-1990) se caracterizó por:', ['la expansión de los derechos políticos', 'violaciones a los derechos humanos y restricción de libertades', 'la descentralización plena', 'el fin de la censura'], 'violaciones a los derechos humanos y restricción de libertades', 'OA 10', 1),
+    ('La transición a la democracia en Chile se consolidó con:', ['el plebiscito de 1988 y las elecciones de 1989', 'una nueva guerra civil', 'la intervención de la ONU', 'la monarquía parlamentaria'], 'el plebiscito de 1988 y las elecciones de 1989', 'OA 11', 2),
+    ('La globalización económica se refiere a:', ['el aislamiento de los países', 'la creciente interdependencia comercial, financiera y cultural mundial', 'el retorno al trueque', 'la desaparición de las fronteras políticas'], 'la creciente interdependencia comercial, financiera y cultural mundial', 'OA 12', 2)]
+_ciencias_media = [
+    ('La estructura básica del átomo está formada por:', ['protones, neutrones y electrones', 'solo protones', 'moléculas y células', 'iones y átomos'], 'protones, neutrones y electrones', 'OA 1', 1),
+    ('En la tabla periódica, los elementos se ordenan según:', ['su color', 'su número atómico', 'su densidad', 'su estado físico'], 'su número atómico', 'OA 2', 1),
+    ('El enlace químico que comparte electrones entre átomos es el enlace:', ['iónico', 'metálico', 'covalente', 'hidrógeno'], 'covalente', 'OA 3', 2),
+    ('La fotosíntesis es un proceso realizado por:', ['todos los seres vivos', 'plantas y algunos microorganismos, que transforman luz en energía química', 'solo animales', 'hongos únicamente'], 'plantas y algunos microorganismos, que transforman luz en energía química', 'OA 4', 1),
+    ('La respiración celular ocurre en:', ['el núcleo', 'las mitocondrias', 'la clorofila', 'la pared celular'], 'las mitocondrias', 'OA 5', 2),
+    ('La genética estudia:', ['la clasificación de seres vivos', 'la herencia y la variación de los genes', 'el clima', 'las rocas'], 'la herencia y la variación de los genes', 'OA 6', 1),
+    ('La teoría de la evolución de Darwin propone que las especies cambian por:', ['selección natural', 'mutaciones voluntarias', 'el clima únicamente', 'la intervención humana siempre'], 'selección natural', 'OA 7', 2),
+    ('En un ecosistema, la relación depredador-presa forma parte de:', ['las cadenas y redes tróficas', 'el ciclo del agua', 'la fotosíntesis', 'la lluvia ácida'], 'las cadenas y redes tróficas', 'OA 8', 1),
+    ('La velocidad de un móvil se calcula como:', ['distancia × tiempo', 'distancia / tiempo', 'tiempo / distancia', 'masa × aceleración'], 'distancia / tiempo', 'OA 9', 1),
+    ('La Segunda Ley de Newton indica que la fuerza es igual a:', ['masa × aceleración', 'masa / aceleración', 'peso × velocidad', 'energía / tiempo'], 'masa × aceleración', 'OA 10', 2),
+    ('La energía cinética es la energía que posee un cuerpo por:', ['su posición', 'su movimiento', 'su temperatura', 'su masa en reposo'], 'su movimiento', 'OA 11', 1),
+    ('El pH de una sustancia ácida es:', ['mayor que 7', 'igual a 7', 'menor que 7', 'exactamente 14'], 'menor que 7', 'OA 12', 2)]
+_ingles_media = [
+    ('Choose the correct form: "If it rains tomorrow, we ___ at home."', ['stay', 'will stay', 'stayed', 'staying'], 'will stay', 'OA 1', 2),
+    ('The passive voice of "Shakespeare wrote Hamlet" is:', ['Hamlet was written by Shakespeare', 'Hamlet is written by Shakespeare', 'Hamlet wrote Shakespeare', 'Hamlet has written by Shakespeare'], 'Hamlet was written by Shakespeare', 'OA 2', 2),
+    ("What does the modal verb 'must' express?", ['ability', 'obligation', 'possibility in the past', 'permission informal'], 'obligation', 'OA 3', 1),
+    ('Select the correct reported speech: She said, "I am tired."', ['She said that she is tired', 'She said that she was tired', 'She said that I am tired', 'She said that she be tired'], 'She said that she was tired', 'OA 4', 3),
+    ('"Although it was late, he continued working." The connector "although" expresses:', ['cause', 'contrast', 'addition', 'sequence'], 'contrast', 'OA 5', 2),
+    ('Choose the word that best completes: "The ___ of the story was unexpected."', ['end', 'ending', 'ended', 'ends'], 'ending', 'OA 6', 2),
+    ("What is the meaning of the phrasal verb 'look after'?", ['to search', 'to take care of', 'to watch TV', 'to find'], 'to take care of', 'OA 7', 2),
+    ('Reading: "Anna has studied French for five years, but she has never visited France." What do we know about Anna?', ['She lives in France', 'She learned French but has not been to France', 'She hates French', 'She was born in France'], 'She learned French but has not been to France', 'OA 8', 3),
+    ('Which sentence uses the present perfect correctly?', ['I have saw that movie', 'I have seen that movie', 'I has seen that movie', 'I seeing that movie'], 'I have seen that movie', 'OA 9', 2),
+    ('The comparative of "intelligent" is:', ['intelligenter', 'more intelligent', 'most intelligent', 'intelligentest'], 'more intelligent', 'OA 10', 1),
+    ("Choose the correct preposition: 'She is interested ___ science.'", ['in', 'on', 'at', 'for'], 'in', 'OA 11', 1),
+    ("What does 'environment' mean?", ['a job interview', 'the natural world around us', 'a type of government', 'a school subject'], 'the natural world around us', 'OA 12', 1)]
+for _lvl in ['MEDIA_1', 'MEDIA_2', 'MEDIA_3', 'MEDIA_4']:
+    MEDIA_BANK.append(('Ciencias Naturales', _lvl, f'Diagnóstico Ciencias Naturales {_lvl[6]}° Medio', 'diagnostico', _ciencias_media))
+    MEDIA_BANK.append(('Historia', _lvl, f'Diagnóstico Historia y Cs. Sociales {_lvl[6]}° Medio', 'diagnostico', _historia_media))
+    MEDIA_BANK.append(('Ingles', _lvl, f'Diagnóstico Inglés {_lvl[6]}° Medio', 'diagnostico', _ingles_media))
+
+    bank = bank + MEDIA_BANK
+
     created = 0
     for subject_name, level, title, kind, qs in bank:
         if db.query(Exam).filter_by(title=title).first():
